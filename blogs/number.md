@@ -88,7 +88,10 @@ parseFloat(num.toFixed(12));
 42n === 42 // false
 typeof 123n // 'bigint'
 -42n // 正确
-+42n // 报错不能表示负数
++42n // 报错不能表示正数
+BigInt.parseInt('9007199254740993', 10)
+1n + 1.3 // 报错不能和Number进行混合运算
+9n / 5n // 1n
 ```
 
 
