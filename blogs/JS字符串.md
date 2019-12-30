@@ -81,7 +81,7 @@ console.log(first + ' and ' + second + ' can' + ((first.normalize('NFC') === sec
 es6为字符串提供遍历接口，并且可以正确处理非BMP字符，传统for不会调用字符串遍历器接口，所以无法正确遍历包含非BMP字符。通过for ... of 或者 Array.from 可以调用遍历器从而正确遍历字符串
 
 
-### 常用API
+### API备忘录
 - **charAt** 可以返回指定位置的字符
 - **link** `'谷歌'.link('https://google.com')  ==>  <a href="https://google.com">谷歌</a>`
 - **anchor** `'锚点在这里'.anchor('here') ==>  <a name="here">锚点在这里</a>`
