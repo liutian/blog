@@ -182,11 +182,11 @@ string.replace(/(\d{4})-(\d{2})-(\d{2})/g,(match, y, m, d) => {
 
 ### 回溯
 **贪婪匹配造成的回溯** 
-![贪婪匹配造成的回溯](../assets/img/regex-1.png)  
+![贪婪匹配造成的回溯](../assets/img/regexp-1.png)  
 **惰性匹配导致回溯**  
-![惰性匹配导致回溯](../assets/img/regex-2.png)
+![惰性匹配导致回溯](../assets/img/regexp-2.png)
 **多选分支导致回溯**  
-![多选分支导致回溯](../assets/img/regex-3.png)
+![多选分支导致回溯](../assets/img/regexp-3.png)
 
 
 ### 正则优化和技巧
