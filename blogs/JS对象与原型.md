@@ -114,9 +114,9 @@ function Component(props) {
 - **Object.prototype.isPrototypeOf** 判断指定的对象是否在本对象的原型链中的原型对象
 
 
-
-
 ### 注意事项
+- `Object.keys('abc') => ['0','1','2']` `Object('abc') => {0: 'a',1: 'b',2: 'c'}`
+
 
 
 ### 函数name属性
