@@ -111,6 +111,7 @@ let result = response.result ?? 'default'; // 仅当 response.result 为 null �
 - `Object.prototype.valueOf` 返回对象的原始值，如果对象没有原始值，则valueOf将返回对象本身，重写该方法可以实现特殊效果
 - `Object.prototype.hasOwnProperty` 判断某个属性是否属于对象自身，而非来自原型链
 - `Object.prototype.isPrototypeOf` 判断指定的对象是否存在于本对象的原型链
+- `Object.prototype.propertyIsEnumerable` 判断当前对象的属性是否是可枚举的
 - `Object.getOwnPropertyNames` 除了包含 `Object.keys` 结果外还会包含对象自身不可枚举的属性
 - `Object.create` 使用指定对象作为新创建对象的原型，第二个可选参数为属性描述符
 - `Object.is` 绝对比较两个值是否相等，比 `===` 更严格，+0 和 -0 不相等，NaN 互不相等
