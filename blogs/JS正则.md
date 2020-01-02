@@ -170,11 +170,8 @@ string.replace(/(\d{4})-(\d{2})-(\d{2})/g,(match, y, m, d) => {
 ```
 
 
-### 通用API
-- String#search
-- String#split
+### API备忘录
 - String#match
-- String#replace
 - String#matchAll
 - RegExp#test
 - RegExp#exec

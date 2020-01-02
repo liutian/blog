@@ -85,16 +85,16 @@ console.log(first + ' and ' + second + ' can' + ((first.normalize('NFC') === sec
 
 
 ### 如何正确遍历字符串
-es6为字符串提供遍历接口，并且可以正确处理非BMP字符，传统for不会调用字符串遍历器接口，所以无法正确遍历包含非BMP字符。通过for ... of 或者 Array.from 可以调用遍历器从而正确遍历字符串
+es6为字符串提供遍历接口，并且可以正确处理非BMP字符，传统for不会调用字符串遍历器接口，所以无法正确遍历包含非BMP字符。通过 `for ... of` 或者 `Array.from` 可以调用遍历器从而正确遍历字符串
 
 
 ### API备忘录
-- **charAt** 可以返回指定位置的字符
-- **link** `'谷歌'.link('https://google.com')  ==>  <a href="https://google.com">谷歌</a>`
-- **anchor** `'锚点在这里'.anchor('here') ==>  <a name="here">锚点在这里</a>`
-- **includes**  **startsWith**  **endsWith**  **padStart** **padEnd**
-- **codePointAt** **charCodeAt** 返回指定位置字符的码点，codePointAt可以识别辅助平面的字符，但是索引参数必须是字符的头一个位置，否则无法识别
-- **String.fromCharCode** **String.fromCodePoint** 可以将unicode码点映射为字符，可以传多个参数最终返回一个字符串，每一个参数映射为一个字符
+- 常用API：`split` `replace` `includes` `indexOf` `search` `startsWith` `endsWith` `padStart` `padEnd`  
+- `charAt` 可以返回指定位置的字符
+- `codePointAt` `charCodeAt` 返回指定位置字符的码点，codePointAt可以识别辅助平面的字符，但是索引参数必须是字符的头一个位置，否则无法识别
+- `String.fromCharCode` `String.fromCodePoint` 可以将unicode码点映射为字符，可以传多个参数最终返回一个字符串，每一个参数映射为一个字符
+- `link` 用法 `'谷歌'.link('https://google.com')  ==>  <a href="https://google.com">谷歌</a>`
+- `anchor` 用法 `'锚点在这里'.anchor('here') ==>  <a name="here">锚点在这里</a>`
 
 
 ### 标签模板
