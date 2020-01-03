@@ -173,3 +173,37 @@ function addOne(a){
 
 
 ### 尾调用优化
+
+
+### async函数
+- `await` 命令后面是一个 `thenable` 对象（即定义then方法的对象），那么 `await` 会将其等同于 `Promise` 对象
+- `async` 函数可以保留运行堆栈
+- 使用 `try...catch` 结构，实现多次重复尝试
+```
+const superagent = require('superagent');
+const NUM_RETRIES = 3;
+
+async function test() {
+  let i;
+  for (i = 0; i < NUM_RETRIES; ++i) {
+    try {
+      await superagent.get('http://google.com/this-throws-an-error');
+      break;
+    } catch(err) {}
+  }
+  console.log(i); // 3
+}
+
+test();
+```
+- 多个 `await` 命令后面的异步操作，如果不存在继发关系，最好让它们同时触发
+```
+// 写法一
+let [foo, bar] = await Promise.all([getFoo(), getBar()]);
+
+// 写法二
+let fooPromise = getFoo();
+let barPromise = getBar();
+let foo = await fooPromise;
+let bar = await barPromise;
+```
