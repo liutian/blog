@@ -23,6 +23,7 @@ let { prop: y } = null; // TypeError
 let [x, y, z] = new Set(['a', 'b', 'c']);
 x // "a"
 
+//字符串也可以进行数组形式的解构赋值
 let [a, b, c] = 'xyz';
 a // 'x'
 b // 'y'
@@ -78,13 +79,17 @@ arr // [true]
 ```
 - 特殊解构赋值默认值
 ```
-let {x: y = 3} = {};
-y // 3
+// 数组也是对象
+let {0:first = 'aa'} = ['xx','yy']; 
 
-let {x: y = 3} = {x: 5};
-y // 5
-
-let {0:first = 'aa'} = ['xx','yy'];
+// 默认值为惰性求值，只有需要默认值时才会进行求值
+let i = 3;
+let {x: y1 = ++i} = {};
+y1 // 4
+i // 4
+let {x: y2 = ++i} = {x: 5};
+y2 // 5
+i // 4
 ```
 - 如果要将一个已经声明的变量用于解构赋值，必须非常小心
 ```
@@ -96,6 +101,12 @@ let x;
 // 正确的写法
 let x;
 ({x} = {x: 1});
+
+
+let obj = {};
+({a: obj.a = 'aaa',b: obj.b = 'bbb'} = {a: 'test'});
+
+let {a: a2 = 'aaa',b: b2 = 'bbb'} = {a: 'test’};
 ```
 
 
