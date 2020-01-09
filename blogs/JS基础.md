@@ -2,16 +2,20 @@
 ### 解构赋值
 - 只有等号两边的 **模式** 相同，左边的变量才会被赋予对应的值，当等号右边的值不是对象或数组，将其转为对象在进行赋值
 ```
+let {name,...newObj} = {name: 'xxx', age: 20, address: 'yyy'};
+let [first,...newArr] = [10,'xx',{},true];
+let {length} = ['xxx']; // 因为数组也是对象
+let {size} = new Map();
+
+// 模式不相同，自动转为包装类
 let {toString: s} = 123;
 s === Number.prototype.toString // true
 
 let {toString: s} = true;
 s === Boolean.prototype.toString // true
 
-let {length} = ['xxx']; // 因为数组也是对象
-let {size} = new Map();
-
-let [foo] = 1; // 报错
+// 模式不相同
+let [foo] = 1; // 报错  
 let [foo] = {}; // 报错
 
 // 由于 undefined 和 null 无法转为对象，所以对它们进行解构赋值，都会报错
@@ -69,14 +73,19 @@ p // ["Hello", {y: "World"}]
 ```
 - 给现有对象或者数组赋值
 ```
+// 错误的写法
+let x;
+{x} = {x: 1};
+// SyntaxError: syntax error
+
+// 正确的写法
+let x;
+({x} = {x: 1});
+
 let obj = {};
-let arr = [];
-
-({ foo: obj.prop, bar: arr[0] } = { foo: 123, bar: true });
-
-obj // {prop:123}
-arr // [true]
+({a: obj.a = 'aaa',b: obj.b = 'bbb'} = {a: 'test'});
 ```
+> 如果要将一个已经声明的变量用于解构赋值，必须非常小心
 - 特殊解构赋值默认值
 ```
 // 数组也是对象
@@ -90,23 +99,6 @@ i // 4
 let {x: y2 = ++i} = {x: 5};
 y2 // 5
 i // 4
-```
-- 如果要将一个已经声明的变量用于解构赋值，必须非常小心
-```
-// 错误的写法
-let x;
-{x} = {x: 1};
-// SyntaxError: syntax error
-
-// 正确的写法
-let x;
-({x} = {x: 1});
-
-
-let obj = {};
-({a: obj.a = 'aaa',b: obj.b = 'bbb'} = {a: 'test'});
-
-let {a: a2 = 'aaa',b: b2 = 'bbb'} = {a: 'test’};
 ```
 
 
@@ -166,18 +158,35 @@ let arr = [...arrayLike];
 
 
 ### 严格模式
-- 变量必须声明后再使用
-- 函数的参数不能有同名属性，否则报错
+- **变量必须声明后再使用**
+- 不能对只读属性赋值，对不可写属性赋值，对给不可扩展对象的新属性赋值
+- 不能删除不可删除的属性
+- 函数的参数不能有同名属性
+- 禁止传统八进制数字语法，统一改用 `0O` 为前缀的八进制写法
 - 不能使用with语句
-- 不能对只读属性赋值，否则报错
-- 不能使用前缀 0 表示八进制数，否则报错
-- 不能删除不可删除的属性，否则报错
-- 不能删除变量delete prop，会报错，只能删除属性delete global[prop]
-- eval不会在它的外层作用域引入变量
-- eval和arguments不能被重新赋值
-- arguments不会自动反映函数参数的变化
-- 不能使用arguments.callee
-- 不能使用arguments.caller
-- 禁止this指向全局对象
-- 不能使用fn.caller和fn.arguments获取函数调用的堆栈
-- 增加了保留字（比如protected、static和interface）
+- **`eval` 不会在它的外层作用域引入变量**
+- 不能删除变量 `delete prop` ，只能删除属性delete global[prop]
+- `eval` 和 `arguments` 不能被重新赋值
+- `arguments` 不会自动反映函数参数的变化
+- 不能使用 `arguments.callee`
+- 不能使用 `arguments.caller`
+- `this` 传递给一个函数的值不会被强制转换为一个对象
+- 不能使用 `fn.caller` 和 `fn.arguments` 获取函数调用的堆栈
+- 增加了保留字 `implements` `interface` `let` `package` `private` `protected` `public` `static` `yield`
+- **严格模式禁止了不在脚本或者函数层面上的函数声明**
+```
+"use strict";
+if (true) {
+  function f() { } // !!! 语法错误
+  f();
+}
+
+for (var i = 0; i < 5; i++) {
+  function f2() { } // !!! 语法错误
+  f2();
+}
+
+function baz() { // 合法
+  function eit() { } // 同样合法
+}
+```
