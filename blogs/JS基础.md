@@ -234,37 +234,29 @@ let arr = [...arrayLike];
 
 
 ### 严格模式
-- **变量必须声明后再使用**
-- 不能对只读属性赋值，对不可写属性赋值，对给不可扩展对象的新属性赋值
-- 不能删除不可删除的属性
+- **无论是全局作用域还是函数作用域都不再意外创建全局变量**
+- **不能对只读属性赋值，不可写属性赋值，不可扩展对象的新属性赋值**
+- **不能删除不可删除的属性**
 - 函数的参数不能有同名属性
 - 禁止传统八进制数字语法，统一改用 `0O` 为前缀的八进制写法
 - 不能使用with语句
-- **`eval` 不会在它的外层作用域引入变量**
+- `eval` 不会在它的外层作用域引入变量
 - 不能删除变量 `delete prop` ，只能删除属性delete global[prop]
 - `eval` 和 `arguments` 不能被重新赋值
-- `arguments` 不会自动反映函数参数的变化
-- 不能使用 `arguments.callee`
-- 不能使用 `arguments.caller`
-- `this` 传递给一个函数的值不会被强制转换为一个对象
+- 参数的值不会随 `arguments` 对象的值的改变而变化
+- 不能使用 `arguments.callee` `arguments.caller`
 - 不能使用 `fn.caller` 和 `fn.arguments` 获取函数调用的堆栈
 - 增加了保留字 `implements` `interface` `let` `package` `private` `protected` `public` `static` `yield`
-- **严格模式禁止了不在脚本或者函数层面上的函数声明**
+- 严格模式禁止了不在脚本或者函数层面上的函数声明，也就是禁止在块级作用域中声明函数
+- 指定的this不再被封装为对象，而且如果没有指定this的话它值是undefined
 ```
 "use strict";
-if (true) {
-  function f() { } // !!! 语法错误
-  f();
-}
-
-for (var i = 0; i < 5; i++) {
-  function f2() { } // !!! 语法错误
-  f2();
-}
-
-function baz() { // 合法
-  function eit() { } // 同样合法
-}
+function fun() { return this; }
+console.assert(fun() === undefined);
+console.assert(fun.call(2) === 2);
+console.assert(fun.apply(null) === null);
+console.assert(fun.call(undefined) === undefined);
+console.assert(fun.bind(true)() === true);
 ```
 
 

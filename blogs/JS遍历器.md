@@ -1,6 +1,6 @@
 ### 遍历器
-引入遍历器概念主要目的是 使用统一 `for ... of` 命令遍历一切可以遍历的数据结构  
-> 遍历器对象除了具有next方法，还可以具有return方法和throw方法。next方法是必须部署的，return方法和throw方法是可选的，return方法的使用场合是，如果for...of循环提前退出（通常是因为出错，或者有break语句），就会调用return方法。如果一个对象在完成遍历前，需要清理或释放资源，就可以部署return方法
+引入遍历器目的是使用 `for ... of` 命令遍历一切可以遍历的数据结构  
+> 实现遍历器接口的对象除了具有 `next` 方法，还可以具有 `return` 方法和 `throw` 方法。`next` 方法是必须部署的，`return` 方法和 `throw` 方法是可选的，`return` 方法的使用场合是，如果 `for...of` 循环提前退出（通常是因为出错，或者有 `break` 语句），就会调用 `return` 方法。如果一个对象在完成遍历前，需要清理或释放资源，就可以部署 `return` 方法
 ```
 let obj = {
   data: [ 'hello', 'world' ],
@@ -38,9 +38,9 @@ interface IterationResult {
   done: boolean,
 }
 ```
-- 原生实现遍历器接口对数据结构** 
+- 原生实现遍历器接口的数据结构  
 `Array` `Map` `Set` `String` `TypedArray` `函数的 arguments 对象` `NodeList 对象`  
-- 默认调用遍历器的场景
+- 遍历器使用场景
 ```
 // 解构赋值
 let [first,...set] = 'hello world';
@@ -51,7 +51,7 @@ let arr = [...'hello world'];
 // Array.from()
 let arr = Array.from('hello world');
 ```
-- 遍历器实现指针结构**  
+- 遍历器实现指针结构  
 ```
 function Obj(value) {
   this.value = value;
