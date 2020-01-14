@@ -1,12 +1,15 @@
 ### 引入模块系统
-浏览器可以识别 `import` `export` 的前提是 `script` 标签必须有 `type="module"` 
-- 浏览器会以 `defer` 方式下载并执行模块代码
 - 浏览器在解析模块代码时默认开启严格模式
+- 同一个模块如果加载多次，将只执行一次
+- 模块中的顶层 `this` 关键字返回 `undefined` ，而不是指向 `window` 
 - 代码是在模块作用域之中运行，而不是在全局作用域运行，模块内部的顶层变量，外部不可见，不会污染全局变量
 -  `import` 命令加载其他模块 `.js` 后缀不可省略，需要提供绝对 `URL` 或相对 `URL` (相对的是当前文件的路径)
-- 模块中的顶层 `this` 关键字返回 `undefined` ，而不是指向 `window` 
-- 同一个模块如果加载多次，将只执行一次。
+- 浏览器可以识别 `import` `export` 的前提是 `script` 标签必须有 `type="module"` 
+- 浏览器会以 `defer` 方式下载并执行模块代码
 
+
+### script脚本加载顺序
+![script脚本加载顺序](./../assets/img/module-1.png)
 
 ### 模块导出
 一个模块就是一个独立的文件，设计思想是尽量的静态化，使得编译时就能确定模块的依赖关系，以及输入和输出的变量
@@ -30,27 +33,27 @@ export {word as w, run as r,Human as H}
 
 
 ### 模块导入
-- 不能更改导入的变量
 ```
+// 不能更改导入的变量
 import { word,run as r } from './human.js';
 
 word = 'xxx'; // Syntax Error Assignment to constant variable
 r = function() { } // Syntax Error Assignment to constant variable
-```
-- 有变量提升效果
-```
+
+
+// 有变量提升效果
 run();
 
 import { run } from './human.js'
-```
-- import语句会执行所加载的模块，且只会执行一次
-```
+
+
+// import语句会执行所加载的模块，且只会执行一次
 import './human.js'; // 只有第一次导入时执行human.js文件
 import './human.js';
 import './human.js';
-```
-- 整体导入
-```
+
+
+// 整体导入
 import * as human from './human.js';
 
 // 模块整体加载所在的那个对象，应该是可以静态分析的，所以不允许运行时改变
@@ -142,3 +145,4 @@ function main(){
 
 
 ### 循环加载
+... 

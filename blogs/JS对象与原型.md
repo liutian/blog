@@ -15,17 +15,12 @@ const human = {
   },
   [fn](){
     return `My motto is ${this.motto}`;
-  },
-  createChild(){},
-  createChild2: function(){}
+  }
 }
 
-human.introduce();
-human.speak();
-
 // 简写的对象方法不能用作构造函数
-new human.createChild() // 报错
-new human.createChild2() // 正常
+new human.introduce();
+new human.speak();
 ```
 > **super** 只能出现在Class方法和对象简写方法中
 
@@ -40,10 +35,13 @@ let ab = Object.assign({}, a, b);
 ```
 - 修改现有对象属性  
 ```
-let newVersion = {
-  ...previousVersion,
+let newObj = {
+  ...oldObj,
   name: 'New Name' 
 };
+
+// 等同于
+let newObj = Object.assign(oldObj, {name: 'New Name});
 ```
 - 可以跟表达式
 ```
@@ -72,14 +70,14 @@ const firstName = message?.body?.user?.firstName || 'default';
 const passwordValue = loginForm.querySelector('input[name=password]')?.value;
 person.sayHello?.();
 ```
-**链运算符禁止用于赋值运算符左侧** `a?.b = c`  
+> 链运算符禁止用于赋值运算符左侧 `a?.b = c`  
 **短路机制**  
 ```
 a?.[++x]
 // 等同于
 a == null ? undefined : a[++x]
 ```
-如果a是undefined或null，那么x不会进行递增运算
+如果 `a` 是 `undefined` 或 `null`，那么 `x` 不会进行递增运算
 
 
 ### Null 判断运算符
@@ -99,8 +97,7 @@ let result = response.result ?? 'default'; // 仅当 response.result 为 null �
 - `Object.keys` 返回对象自身可枚举属性名称的数组（包括方法）
 - `JSON.stringify` 只串行化对象自身可枚举的属性和 `Object.keys` 类似但是不包括方法
 - `Object.assign` 只拷贝对象自身可枚举的属性和 `Object.keys` 一致
-> 类中定义的方法都是不可枚举的
-> 尽量 `Object.keys` 替代 for...in
+> 类中定义的方法都是不可枚举的，尽量 `Object.keys` 替代 `for...in`
 
 
 ### API备忘录
@@ -119,7 +116,6 @@ let result = response.result ?? 'default'; // 仅当 response.result 为 null �
 - `Object.getPrototypeOf` 返回指定对象的原型 `Object.getPrototypeOf(Child) === Parent`
 - `Object.setPrototypeOf` 设置指定对象的原型
 - `Reflect.ownKeys` 除了包含 `Object.getOwnPropertyNames` 结果外还会包含对象自身 `Symbol` 属性
-> 当访问一个基本数据类型属性或者方法时，后台会自动创建对应的基本包转类型的对象
 
 
 ### 类定义
@@ -131,12 +127,13 @@ class Human {
   [ability](){ } // 动态属性名
 
   // 私有属性和方法使用 # 为前缀，避免和其他变量混淆，而且私有属性和私有方法可以和正常的属性和方法重名
-  // 之所以要引入一个新的前缀#表示私有属性，而没有采用private关键字，是因为 JavaScript 是一门动态语言，没有类型声明，使用独立的符号似乎是唯一的比较方便可靠的方法，能够准确地区分一种属性是否为私有属性
+  // 之所以要引入一个新的前缀#表示私有属性，而没有采用private关键字，是因为 JavaScript 是一门动态语言，没有类型声明，
+  // 使用独立的符号似乎是唯一的比较方便可靠的方法，能够准确地区分一种属性是否为私有属性
   #nickname = 'z'; 
   #introduce(){ 
     return `My nickname is ${this.#nickname} , my motto is ${this.#introduce()}`;
   } 
-  introduce(){
+  introduce(){ // 私有和公开方法名可以重名
     return this.#introduce();
   }
 
@@ -168,7 +165,7 @@ const h = new class { }()
 
 // 子类继承父类
 class Student extends Human {
-  // 子类继承父类时，子类要么不写构造函数如果写构造函数就必须在构造函数中调用super()，而且必须在使用this之前调用
+  // 子类继承父类时，子类要么不写构造函数如果写构造函数就必须在构造函数中调用super()，而且必须在使用this之前调用，否则在创建类实例时会报错
   constructor() {
     console.log('student init ...');
     super();
@@ -179,12 +176,12 @@ class Student extends Human {
 - 类中定义的方法都是不可枚举的
 - 类内部默认启用严格模式
 - 类不存在变量提升，保证类的继承
-- 类必须通过 `new` 关键字来调用，不能单独调用
+- 类必须通过 `new` 关键字来调用，不能单独调用，否则报错
 - `super()` 相当于 `Parent.prototype.constructor.call(this)` 而 `this` 指向 `Child` 的实例，也就是在`new Child()`时，当执行父类的构造函数时，`this` 指向子类对象，执行子类其他函数时如果函数里面又通过 `super.xxx()` 执行了父类方法，那么父类方法里面的 `this` 也是指向子类对象
 - 如果在子类方法中访问 `super.xxx` 能够访问定义父类原型上的方法和属性，不能访问实例属性，也就是在子类中 `super.xxx()` 相当于 `Parent.prototype.xxx.call(this)`  `super.xxx` 相当于  `Parent.prototype.xxx`
 - 如果通过 `super` 对某个属性赋值，这时 `super` 就是 `this`，赋值的属性会变成子类实例的属性
 - 在子类的静态方法中通过 `super` 调用父类的方法时，方法内部的 `this` 指向当前的子类，而不是子类的实例
-- 类可以继承原生类，从而可以根据原生类自定义自己的类，包括：Number/Boolean/String/Date/Array/RegExp/Object/Function/Error
+- 类可以继承原生类，从而可以根据原生类自定义自己的类，包括：`Number` `Boolean` `String` `Date` `Array` `RegExp` `Object` `Function` `Error`
 
 
 ### 子类 __proto__ 与 prototype

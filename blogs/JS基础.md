@@ -239,16 +239,16 @@ let arr = [...arrayLike];
 - **不能删除不可删除的属性**
 - 函数的参数不能有同名属性
 - 禁止传统八进制数字语法，统一改用 `0O` 为前缀的八进制写法
-- 不能使用with语句
+- 不能使用 `with` 语句
 - `eval` 不会在它的外层作用域引入变量
-- 不能删除变量 `delete prop` ，只能删除属性delete global[prop]
+- 不能删除变量 `delete prop` ，只能删除属性 `delete globalThis[prop]`
 - `eval` 和 `arguments` 不能被重新赋值
 - 参数的值不会随 `arguments` 对象的值的改变而变化
 - 不能使用 `arguments.callee` `arguments.caller`
 - 不能使用 `fn.caller` 和 `fn.arguments` 获取函数调用的堆栈
 - 增加了保留字 `implements` `interface` `let` `package` `private` `protected` `public` `static` `yield`
 - 严格模式禁止了不在脚本或者函数层面上的函数声明，也就是禁止在块级作用域中声明函数
-- 指定的this不再被封装为对象，而且如果没有指定this的话它值是undefined
+- 指定的 `this` 不再被封装为对象，而且如果没有指定 `this` 的话它值是 `undefined`
 ```
 "use strict";
 function fun() { return this; }

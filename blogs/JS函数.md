@@ -1,6 +1,5 @@
 ### 函数参数默认值
 当参数值为 `undefined` 时会被赋予指定默认值
-- 指定了默认值以后，函数的 `length` 属性，将返回没有指定默认值的参数个数
 - 参数默认值不是传值的，而是每次都重新计算默认值表达式的值
 ```
 let x = 0;
@@ -11,7 +10,7 @@ function hello(y = x + 1){
 hello() // 1
 hello() // 2
 ```
-- 与结构赋值默认值结合使用
+- 与解构赋值结合使用
 ```
 function hello({x, y = 5} = {}) {
   console.log(x, y);
@@ -19,7 +18,7 @@ function hello({x, y = 5} = {}) {
 
 hello() // undefined 5
 ```
-- 设置了参数的默认值，函数进行声明初始化时，参数会形成一个单独的作用域（context）。等到初始化结束，这个作用域就会消失
+- 参数的默认值会使参数形成一个单独的作用域（context）。等到初始化结束，这个作用域就会消失
 ```
 var x = 1;
 
@@ -39,7 +38,7 @@ function f(y = x) {
 }
 
 f() // 1
-// 全局变量x不存在，就会报错
+// 如果全局变量x不存在，就会报错
 
 
 // 参数的默认值是一个函数，该函数的作用域也遵守这个规则
@@ -68,22 +67,21 @@ foo()
 
 
 ### rest参数
-用于获取函数的多余参数，这样就不需要使用arguments对象了。rest 是一个 **真正** 数组，而 `arguments` 是一个伪数组 
+用于获取函数的多余参数，这样就不需要使用 `arguments` 对象了。`rest` 是一个 **真正** 数组，而 `arguments` 是一个伪数组 
 ```
-// arguments变量的写法
 function sortNumbers() {
   return Array.prototype.slice.call(arguments).sort();
 }
 
-// rest参数的写法
+// rest简化之后
 const sortNumbers = (...numbers) => numbers.sort();
 ```
-> rest 参数之后不能再有其他参数（即只能是最后一个参数），否则会报错
+> `rest` 参数之后不能再有其他参数（即只能是最后一个参数），否则会报错
 
 
 ### 箭头函数
 箭头函数体内的 `this` 对象，就是定义时所在的对象，而不是使用时所在的对象  
-`this` 指向的固定化，并不是因为箭头函数内部有绑定 `this` 的机制，实际原因是箭头函数根本没有自己的 `this`，导致内部的 `this` 就是外层代码块的 `this`。正是因为它没有 `this`，所以也就不能用作构造函数，除了this，以下三个变量在箭头函数之中也是不存在的，指向外层函数的对应变量：`arguments` `super` `new.target` 另外，由于箭头函数没有自己的this，所以当然也就不能用 `call` `apply` `bind` 这些方法去改变this的指向
+`this` 指向的固定化，并不是因为箭头函数内部有绑定 `this` 的机制，实际原因是箭头函数根本没有自己的 `this`，导致内部的 `this` 就是外层代码块的 `this`。正是因为它没有 `this`，所以也就不能用作构造函数，除了`this`，以下三个变量在箭头函数之中也是不存在的，指向外层函数的对应变量：`arguments` `super` `new.target` 另外，由于箭头函数没有自己的 `this`，所以当然也就不能用 `call` `apply` `bind` 这些方法去改变 `this` 的指向
 - 如果箭头函数不需要参数或需要多个参数，需要用圆括号代表参数部分
 ```
 var f = () => 5;
@@ -96,7 +94,7 @@ var sum = function(num1, num2) {
   return num1 + num2;
 };
 ```
-- 如果箭头函数的代码块部分多于一条语句，就要使用大括号将它们括起来，并且使用return语句返回。
+- 如果箭头函数的代码块部分多于一条语句，就要使用大括号将它们括起来，并且使用 `return` 语句返回。
 ```
 var sum = (num1, num2) => { 
   return num1 + num2; 
@@ -172,9 +170,6 @@ function addOne(a){
 - `apply` `call`
 
 
-### 尾调用优化
-
-
 ### async函数
 - `await` 命令后面是一个 `thenable` 对象（即定义then方法的对象），那么 `await` 会将其等同于 `Promise` 对象
 - `async` 函数可以保留运行堆栈
@@ -191,7 +186,6 @@ async function test() {
       break;
     } catch(err) {}
   }
-  console.log(i); // 3
 }
 
 test();
