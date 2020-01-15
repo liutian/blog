@@ -13,3 +13,16 @@
 - 代理对象
 - Symbol
 - 操作二进制
+
+
+### Web API
+- dom&event
+- form
+- ajax&fetch
+- storage&indexedDB&cookies
+- canvas2d
+- video&audio
+- serviceWorker
+- svg
+- CSP
+- File

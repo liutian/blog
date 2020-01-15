@@ -273,3 +273,31 @@ let b = 1;
 window.b // undefined
 ```
 > `ES2020` 在语言标准的层面，引入 `globalThis` 作为顶层对象。也就是说，任何环境下，`globalThis` 都是存在的，都可以从它拿到顶层对象，指向全局环境下的 `this`
+
+
+### JSON
+**格式规范**   
+- 基本类型：`string` `number` `boolean` `null`
+- 结构化类型：`Object` `Array`
+- **属性名**必须使用双引号，**属性值**只有字符串类型需要双引号，其他类型不需要双引号
+
+**JSON.stringify**  
+- `undefined` 函数 `symbol` 作为对象属性值时会忽略该属性
+- `undefined` 函数 `symbol` 作为数组元素值时会序列化 `null`
+- `undefined` 函数 `symbol` 作为单独的值进行序列化时返回 `undefined`
+- 如果对象有 `toJSON` 方法，直接调用 `toJSON` 方法，并且停止遍历该对象下的其他属性（Date类型默认有自己的 `toJSON` 方法）
+- 当第二个参数为函数时类似数组 `map` 方法，而且函数第一次调用时，参数 `key` 为空，`value` 为整个对象
+- 当第二个参数为数组时，只会返回数组中出现的属性  
+
+**JSON.stringify实现深度拷贝的弊端**
+- 拷贝带有循环引用的对象时会报错
+- 无法拷贝函数  
+
+**高性能JSON.stringify实现思路**
+- 开发者事先定义 `JSON scheme`
+- 根据 `JSON scheme` 生成对应的模板方法，模板方法会对属性与值进行字符串拼接
+- 最后开发者执行模板方法，并传入需要转换的对象实例  
+> [高性能JSON.parse实现](https://github.com/youngwind/blog/issues/115)  
+> [深度拷贝各种实现与JSON.stringify实现的对比测试报告](https://jsperf.com/deep-copy-vs-json-stringify-json-parse/115)  
+> JSON Schema规范: [链接](https://www.jianshu.com/p/1711f2f24dcf?utm_campaign=hugo) [链接](https://www.jianshu.com/p/8278eb2458c4?winzoom=1)  
+> 可视化JSON Schema生成器：[链接](https://github.com/YMFE/json-schema-editor-visual) [链接](https://github.com/jdorn/json-editor) [链接](https://github.com/jackwootton/json-schema) [链接](https://github.com/rjsf-team/react-jsonschema-form)
