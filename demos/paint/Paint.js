@@ -1,5 +1,5 @@
 
-export default class MaLiang {
+export default class Paint {
   mousePointOffset = 20;
   pointAreaWidth = 120;
   pointAreaHeight = 90;

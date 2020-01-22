@@ -5,7 +5,7 @@ img.addEventListener('load', init);
 img.src = './bg.png';
 
 function init() {
-  new MaLiang({
+  new Paint({
     container: '#container',
     bgImage: img,
     width: img.width,
