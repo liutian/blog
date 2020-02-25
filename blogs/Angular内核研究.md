@@ -1,26 +1,3 @@
-### 资料
-- [视图数据结果](https://github.com/angular/angular/tree/master/packages/core/src/render3/VIEW_DATA.md)
-- [优化思路](https://github.com/angular/angular/tree/master/packages/core/src/render3/PERF_NOTES.md)
-- [编译器架构](https://github.com/angular/angular/tree/master/packages/compiler/design/architecture.md)
-- [ivy工作原理](../assets/doc/Angular-Ivy.pptx)
-
-
-### 构建模型
-- 在Ivy没有完全替代旧版本之前，框架核心库以及周边官方库发布到npm上的代码是非Ivy代码
-- 当首次执行 `npm start` 或者 `npm build` 时编译器会对 `node_modules` 下的代码进行 `Ivy` 编译并保存在对应目录下
-- 当再次执行 `npm start` 或者 `npm build` 时编译器只会编译当前项目代码，不在对 `node_modules` 进行额外编译处理，提供编译效率
-
-
-### 注入器结构
-平台注入器 -> 根级ngZone注入器 -> 主模块注入器 -> 组件注入器
-
-### 术语
-- `platform` 特定程序解析和执行环境，主要功能是提供一组相关联的静态供应商和对应的注入器
-- `applaction` 一个完整angular程序实例，主要功能是推动变更检测
-- `module` 一组相关angular组件的集合，主要功能是提供一组相关联的供应商和对应的注入器
-- `component` 实现特定UI功能的实力
-
-
 ### 前置内容
 - [zone.js](https://github.com/angular/angular/blob/master/packages/zone.js/lib/zone.ts) 通过拦截浏览器原生异步API，来监控页面发生的异步事件，并发出通知，`Angular` 在合适的时机执行变更检测
   ```
@@ -32,6 +9,30 @@
   });
   ```
 - [rxjs](https://rxjs-dev.firebaseapp.com/api) 
+
+
+### 术语
+- `platform` 特定程序解析和执行环境，主要功能是提供一组相关联的静态供应商和对应的注入器
+- `applaction` 一个完整angular程序实例，主要功能是推动变更检测
+- `module` 一组相关angular组件的集合，主要功能是提供一组相关联的供应商和对应的注入器
+- `component` 实现特定UI功能的实力
+
+
+### 构建模型
+- 在Ivy没有完全替代旧版本之前，框架核心库以及周边官方库发布到npm上的代码是非Ivy代码
+- 当首次执行 `npm start` 或者 `npm build` 时编译器会对 `node_modules` 下的代码进行 `Ivy` 编译并保存在对应目录下
+- 当再次执行 `npm start` 或者 `npm build` 时编译器只会编译当前项目代码，不在对 `node_modules` 进行额外编译处理，提供编译效率
+
+
+### 注入器结构
+平台注入器 -> 根级ngZone注入器 -> 主模块注入器 -> 组件注入器
+
+
+### 资料
+- [视图数据结构](https://github.com/angular/angular/tree/master/packages/core/src/render3/VIEW_DATA.md)
+- [优化思路](https://github.com/angular/angular/tree/master/packages/core/src/render3/PERF_NOTES.md)
+- [编译器架构](https://github.com/angular/angular/tree/master/packages/compiler/design/architecture.md)
+- [ivy工作原理](../assets/doc/Angular-Ivy.pptx)
 
 
 ### 启动流程
@@ -111,14 +112,13 @@
       ```   
     - 创建导入模块类的实例，同时 `ApplicatonRef` 和 主模块类实例会一并创建
   - 执行应用初始化程序 -> `ApplicationInitStatus`
-  - 引导根组件 -> `moduleRef._bootstrapComponents.forEach(f => appRef.bootstrap(f))`
+  - 引导根组件进行初始化和首次变更检测 -> `moduleRef._bootstrapComponents.forEach(f => appRef.bootstrap(f))`
     - 创建根组件工厂 [ComponentFactory](https://github.com/angular/angular/tree/master/packages/core/src/render3/component_ref.ts)
     - 创建根组件实例 `ComponentFactory.create`
-      - 创建组件视图级别的注入器
+      - 创建根组件特有注入器
+      - 创建根组件渲染器
       - 获取根组件对应DOM对象
       - 创建根组件上下文对象
-      - 创建根组件 `TView`
-      - 创建根组件 `LView`
-      - 创建根组件视图
-        - 创建DOM类型 `tNode`
-      - 创建根组件实例
+      - 创建顶层 `TView` `LView`
+      - 创建根组件 `TView` `LView`
+      - 创建根组件类实例
