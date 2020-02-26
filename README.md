@@ -17,12 +17,14 @@
 
 ### Web API
 - dom&event
-- form
 - ajax&fetch
+- form
 - storage&indexedDB&cookies
-- canvas2d
-- video&audio
-- serviceWorker
-- svg
-- CSP
 - File
+- CSP
+- video&audio
+- webWorker&shareWorker
+- serviceWorker
+- webComponent
+- canvas2d
+- svg
