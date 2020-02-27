@@ -1,6 +1,9 @@
 
+import HOST_TEMPLATE from './template.js';
+import HOST_STYLE from './style.js';
+import { resizeHighOrder, moveHighOrder, fixedPositionHighOrder } from './util.js';
 
-export class SZPaint extends HTMLElement {
+export default class SZPaint extends HTMLElement {
 
   // 常量
   mousePointOffset = 20;
@@ -35,7 +38,7 @@ export class SZPaint extends HTMLElement {
   primaryToolWidth = -1;
   primaryToolHeight = -1;
   secondaryToolWidth = -1;
-  secondaryToolWidth = -1;
+  secondaryToolHeight = -1;
 
   hostData = {};
   clipFrameBox = null;
@@ -118,7 +121,7 @@ export class SZPaint extends HTMLElement {
      * 创建元素
      */
   initEle() {
-    this._shadowRoot.innerHTML = HOST_HTML;
+    this._shadowRoot.innerHTML = HOST_TEMPLATE;
     const style = document.createElement('style');
     style.textContent = HOST_STYLE;
     this._shadowRoot.appendChild(style);
@@ -236,10 +239,10 @@ export class SZPaint extends HTMLElement {
   }
 
   bindEvent() {
-    this.addEventListener('mousemove', this.hostMouseMove.bind(this));
-    this.addEventListener('mousedown', this.hostMouseDown.bind(this));
-    this.addEventListener('mouseup', this.hostMouseUp.bind(this));
-    this.addEventListener('mouseleave', this.hostMouseLeave.bind(this));
+    this._shadowRoot.addEventListener('mousemove', this.hostMouseMove.bind(this));
+    this._shadowRoot.addEventListener('mousedown', this.hostMouseDown.bind(this));
+    this._shadowRoot.addEventListener('mouseup', this.hostMouseUp.bind(this));
+    this._shadowRoot.addEventListener('mouseleave', this.hostMouseLeave.bind(this));
     this.toolBarEle.addEventListener('mousedown', (e) => {
       e.stopPropagation();
     });
@@ -560,305 +563,3 @@ export class SZPaint extends HTMLElement {
   }
 }
 
-
-const HOST_HTML = `
-  <canvas class="backdrop"></canvas>
-  <canvas class="persistence"></canvas>
-  <canvas class="realtime"></canvas>
-
-  <div class="mouse-point">
-    <canvas class="point-area"></canvas>
-    <div class="point-info">
-      RGB: <span class="point-color"></span><br>
-      坐标: <span class="point-location"></span>
-    </div>
-  </div>
-
-  <div class="clip-frame">
-    <div class="resize-anchor " data-index="0"></div>
-    <div class="resize-anchor " data-index="1"></div>
-    <div class="resize-anchor " data-index="2"></div>
-    <div class="resize-anchor " data-index="3"></div>
-    <div class="resize-anchor " data-index="4"></div>
-    <div class="resize-anchor " data-index="5"></div>
-    <div class="resize-anchor " data-index="6"></div>
-    <div class="resize-anchor " data-index="7"></div>
-    <div class="clip-info"></div>
-  </div>
-
-  <div class="tool-bar">
-    <div class="primary-tool">
-      <span class="graph-tool tool-item" data-type="rect" >矩</span>
-      <span class="graph-tool tool-item" data-type="circular">圆</span>
-      <span class="graph-tool tool-item" data-type="arrow">箭</span>
-      <span class="graph-tool tool-item" data-type="paint">笔</span>
-      <span class="graph-tool tool-item" data-type="mosaic">糊</span>
-      <span class="graph-tool tool-item" data-type="font">字</span>
-      <span class="separator"></span>
-      <span class="cancel-tool tool-item" >消</span>
-      <span class="save-tool tool-item" >保</span>
-      <span class="separator tool-item"></span>
-      <span class="exit-tool tool-item" >退</span>
-      <span class="over-tool tool-item" >完</span>
-    </div>
-
-    <div class="location-marker"></div>
-
-    <div class="secondary-tool">
-      <select class="font-size-tool">
-        <option value="small">小</option>
-        <option value="normal">中</option>
-        <option value="large">大</option>
-      </select>
-
-      <span class="size-tool">
-        <span class=" tool-item" data-size="small">小</span>
-        <span class=" tool-item" data-size="normal">中</span>
-        <span class=" tool-item" data-size="large">大</span>
-      </span>
-
-      <span class="color-tool">
-        <span class=" tool-item" data-color="red">红</span>
-        <span class=" tool-item" data-color="yellow">黄</span>
-        <span class=" tool-item" data-color="blue">蓝</span>
-        <span class=" tool-item" data-color="green">绿</span>
-        <span class=" tool-item" data-color="gray">灰</span>
-        <span class=" tool-item" data-color="white">白</span>
-      </span>
-
-
-    </div>
-  </div>
-`;
-
-const HOST_STYLE = `
-  :host() {
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-
-  .backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    filter: brightness(0.6);
-  }
-
-  .persistence {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .realtime {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .mouse-point {
-    position: absolute;
-    left: 10000px;
-    top: 0;
-    width: 120px;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .point-info {
-    line-height: 1.3;
-    padding: 5px 0 5px 5px;
-    background-color: #000;
-    color: #fff;
-    font-size: 12px;
-    box-sizing: border-box;
-    user-select: none;
-  }
-
-  .clip-frame {
-    position: absolute;
-    top: 0;
-    left: 10000px;
-    border: solid 2px #00ccff;
-    box-sizing: border-box;
-  }
-
-  .resize-anchor {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border: solid #00ccff 1px;
-    border-radius: 50%;
-    background-color: #fff;
-    cursor: pointer;
-    box-sizing: border-box;
-  }
-
-  .clip-info {
-    position: absolute;
-    left: 5px;
-    top: 0;
-    line-height: 20px;
-    font-size: 12px;
-    color: #fff;
-    width: 100px;
-    user-select: none;
-    cursor: auto;
-  }
-
-  .primary-tool {
-    display: inline-block;
-    background-color: #4c4c4c;
-    border-radius: 4px;
-    text-align: left;
-    padding: 5px 20px;
-  }
-
-  .secondary-tool {
-    position: absolute;
-    background-color: #4c4c4c;
-    border-radius: 4px;
-    text-align: left;
-    padding: 5px 10px;
-    box-sizing: border-box;
-  }
-
-  .location-marker {
-    position: absolute;  
-    border: solid 5px transparent;
-    border-bottom-color: #4c4c4c;
-  }
-`;
-
-
-function resizeHighOrder({ index, rectX, rectY, rectWidth, rectHeight }) {
-  let oneWayDrag, fixedPointX, fixedPointY, oneWayXLength, oneWayYLength, lastX, lastY;
-
-  if (index === 0) {
-    oneWayDrag = false;
-    fixedPointX = rectX + rectWidth;
-    fixedPointY = rectY + rectHeight;
-  } else if (index === 1) {
-    oneWayDrag = true;
-    fixedPointX = rectX;
-    fixedPointY = rectY + rectHeight;
-    oneWayXLength = rectWidth;
-  } else if (index === 2) {
-    oneWayDrag = false;
-    fixedPointX = rectX;
-    fixedPointY = rectY + rectHeight;
-  } else if (index === 3) {
-    oneWayDrag = true;
-    fixedPointX = rectX;
-    fixedPointY = rectY;
-    oneWayYLength = rectHeight;
-  } else if (index === 4) {
-    oneWayDrag = false;
-    fixedPointX = rectX;
-    fixedPointY = rectY;
-  } else if (index === 5) {
-    oneWayDrag = true;
-    fixedPointX = rectX;
-    fixedPointY = rectY;
-    oneWayXLength = rectWidth;
-  } else if (index === 6) {
-    oneWayDrag = false;
-    fixedPointX = rectX + rectWidth;
-    fixedPointY = rectY;
-  } else if (index === 7) {
-    oneWayDrag = true;
-    fixedPointX = rectX + rectWidth;
-    fixedPointY = rectY;
-    oneWayYLength = rectHeight;
-  }
-
-
-  return function resize(x, y) {
-    if (oneWayDrag) {
-      if (oneWayXLength !== undefined) {
-        return {
-          x: fixedPointX,
-          y: Math.min(y, fixedPointY),
-          width: oneWayXLength,
-          height: Math.abs(fixedPointY - y),
-        }
-      } else {
-        return {
-          x: Math.min(x, fixedPointX),
-          y: fixedPointY,
-          width: Math.abs(x - fixedPointX),
-          height: oneWayYLength
-        }
-      }
-    } else {
-      return {
-        x: Math.min(x, fixedPointX),
-        y: Math.min(y, fixedPointY),
-        width: Math.abs(x - fixedPointX),
-        height: Math.abs(y - fixedPointY)
-      }
-    }
-  }
-}
-
-function moveHighOrder({ offsetX, offsetY, rectWidth, rectHeight, hostWidth, hostHeight }) {
-  return function (x, y) {
-    let _x = x - offsetX;
-    let _y = y - offsetY;
-
-    if (_x <= 0) {
-      _x = 0;
-    } else if (_x >= hostWidth - rectWidth) {
-      _x = hostWidth - rectWidth;
-    }
-
-    if (_y <= 0) {
-      _y = 0;
-    } else if (_y >= hostHeight - rectHeight) {
-      _y = hostHeight - rectHeight;
-    }
-
-    return {
-      x: _x,
-      y: _y
-    }
-  }
-}
-
-function fixedPositionHighOrder(hostWidth, hostHeight, maxWidth, maxHeight, minHeight, offsetY) {
-  return function (x, y, width, height) {
-    let positionX, positionY, location = 0;
-
-    if (y + height + maxHeight + offsetY > hostHeight) {
-      positionY = y - minHeight - offsetY;
-      location |= 1;
-    } else {
-      positionY = y + height + offsetY;
-      location |= 2;
-    }
-
-    if (x + maxWidth > hostWidth) {
-      positionX = x + width - maxWidth;
-      location |= 4;
-    } else {
-      positionX = x;
-      location |= 8;
-    }
-
-    return {
-      x: positionX,
-      y: positionY,
-      location // 从左到右从高到低 1001 101 110  1010
-    }
-  }
-}
-
-function paramsError(param) {
-  throw new Error(`params(${param}) can not empty`);
-}
-
-window.customElements.define('sz-paint', SZPaint);
