@@ -6,32 +6,52 @@ import { resizeHighOrder, moveHighOrder, fixedPositionHighOrder, setHandlePoints
 export default class SZPaint extends HTMLElement {
 
   // 常量
+  // 鼠标点的预览区域距离鼠标的偏移量
   mousePointOffset = 20;
+  // 预览区的宽度
   pointAreaWidth = 120;
+  // 预览区的高度
   pointAreaHeight = 90;
 
 
   // UI元素
+  // 预览区容器
   mousePointEle = null;
-  clipInfoEle = null;
-  clipFrameEle = null;
+  // 预览点颜色值
   pointColorEle = null;
+  // 预览点位置
   pointLocationEle = null;
+  // 截取区容器
+  clipFrameEle = null;
+  // 截取区域
+  clipInfoEle = null;
+  // 工具栏
   toolBarEle = null;
+  // 主工具栏
   primaryToolEle = null;
+  // 附属工具栏
   secondaryToolEle = null;
+  // 工具栏指示箭头
+  locationMarker = null;
+  // 工具栏中的尺寸
   sizeToolEle = null;
+  // 工具栏中的颜色
   colorToolEle = null;
+  // 工具栏中的字体
   fontSizeToolEle = null;
+  // 背景画布
   backdropCanvas = null;
+  // 预览区画布
   pointAreaCanvas = null;
+  // 创作区画布
   persistenceCanvas = null;
+  // 当前创作区画布
   realtimeCanvas = null;
   backdropCtx = null;
   pointAreaCtx = null;
   persistenceCtx = null;
   realtimeCtx = null;
-  locationMarker = null;
+
 
 
   // 动态变量
@@ -51,10 +71,9 @@ export default class SZPaint extends HTMLElement {
   posToolBarFn = null;
 
   toolState = null;
-
   currToolState = null;
 
-  _resetTimeoutId = null;
+  resetTimeoutId = null;
   _shadowRoot = null;
 
   constructor() {
@@ -63,6 +82,11 @@ export default class SZPaint extends HTMLElement {
     }
     super();
     this._shadowRoot = this.attachShadow({ mode: 'closed' });
+
+    this._shadowRoot.addEventListener('mousemove', this.hostMouseMove.bind(this));
+    this._shadowRoot.addEventListener('mousedown', this.hostMouseDown.bind(this));
+    this._shadowRoot.addEventListener('mouseup', this.hostMouseUp.bind(this));
+    this._shadowRoot.addEventListener('mouseleave', this.hostMouseLeave.bind(this));
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -88,12 +112,12 @@ export default class SZPaint extends HTMLElement {
       return;
     }
 
-    if (this._resetTimeoutId) {
-      clearTimeout(this._resetTimeoutId);
+    if (this.resetTimeoutId) {
+      clearTimeout(this.resetTimeoutId);
     }
 
-    this._resetTimeoutId = setTimeout(() => {
-      this._resetTimeoutId = null;
+    this.resetTimeoutId = setTimeout(() => {
+      this.resetTimeoutId = null;
 
       this.toolState = {
         rect: { size: 'normal', color: 'red', locationX: -1 },
@@ -104,6 +128,11 @@ export default class SZPaint extends HTMLElement {
         font: { size: 'normal', color: 'red', locationX: -1 }
       };
       this.currToolState = null;
+      this.resizeClipFrameFn = null;
+      this.moveClipFrameFn = null;
+      this.posToolBarFn = null;
+      this.clipFrameBox = null;
+      this.imageData = null;
 
       this.bgImage = new Image();
       this.bgImage.src = this.hostData.src;
@@ -193,10 +222,6 @@ export default class SZPaint extends HTMLElement {
   }
 
   bindEvent() {
-    this._shadowRoot.addEventListener('mousemove', this.hostMouseMove.bind(this));
-    this._shadowRoot.addEventListener('mousedown', this.hostMouseDown.bind(this));
-    this._shadowRoot.addEventListener('mouseup', this.hostMouseUp.bind(this));
-    this._shadowRoot.addEventListener('mouseleave', this.hostMouseLeave.bind(this));
     this.toolBarEle.addEventListener('mousedown', (e) => {
       e.stopPropagation();
     });

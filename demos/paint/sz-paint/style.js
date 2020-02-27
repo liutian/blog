@@ -85,6 +85,7 @@ const HOST_STYLE = `
     border-radius: 4px;
     text-align: left;
     padding: 5px 20px;
+    cursor: default;
   }
 
   .secondary-tool {
@@ -94,6 +95,7 @@ const HOST_STYLE = `
     text-align: left;
     padding: 5px 10px;
     box-sizing: border-box;
+    cursor: default;
   }
 
   .location-marker {
@@ -101,6 +103,7 @@ const HOST_STYLE = `
     border: solid 5px transparent;
     border-bottom-color: #4c4c4c;
   }
+
 `;
 
 export default HOST_STYLE;
