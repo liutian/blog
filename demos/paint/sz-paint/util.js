@@ -120,3 +120,54 @@ export function fixedPositionHighOrder(hostWidth, hostHeight, maxWidth, maxHeigh
     }
   }
 }
+
+
+export function setHandlePoints(points) {
+  points[0].style.cssText = `
+    left: -5px;
+    top: -5px;
+    cursor: nwse-resize;
+  `;
+
+  points[1].style.cssText = `
+    left: calc(50% - 4px);
+    top: -5px;
+    cursor: ns-resize;
+  `;
+
+  points[2].style.cssText = `
+    left: calc(100% - 3px);
+    top: -5px;
+    cursor: nesw-resize;
+  `;
+
+  points[3].style.cssText = `
+    left: calc(100% - 3px);
+    top: calc(50% - 4px);
+    cursor: ew-resize;
+  `;
+
+  points[4].style.cssText = `
+    left: calc(100% - 3px);
+    top: calc(100% - 3px);
+    cursor: nwse-resize;
+  `;
+
+  points[5].style.cssText = `
+    left: calc(50% - 4px);
+    top: calc(100% - 3px);
+    cursor: ns-resize;
+  `;
+
+  points[6].style.cssText = `
+    left: -5px;
+    top: calc(100% - 3px);
+    cursor: nesw-resize;
+  `;
+
+  points[7].style.cssText = `
+    left: -5px;
+    top: calc(50% - 4px);
+    cursor: ew-resize;
+  `;
+}

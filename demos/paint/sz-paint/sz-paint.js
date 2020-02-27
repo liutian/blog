@@ -1,7 +1,7 @@
 
 import HOST_TEMPLATE from './template.js';
 import HOST_STYLE from './style.js';
-import { resizeHighOrder, moveHighOrder, fixedPositionHighOrder } from './util.js';
+import { resizeHighOrder, moveHighOrder, fixedPositionHighOrder, setHandlePoints } from './util.js';
 
 export default class SZPaint extends HTMLElement {
 
@@ -163,53 +163,7 @@ export default class SZPaint extends HTMLElement {
 
     const resizeAnchors = this._shadowRoot.querySelectorAll('.resize-anchor');
 
-    resizeAnchors[0].style.cssText = `
-      left: -5px;
-      top: -5px;
-      cursor: nwse-resize;
-    `;
-
-    resizeAnchors[1].style.cssText = `
-      left: calc(50% - 4px);
-      top: -5px;
-      cursor: ns-resize;
-    `;
-
-    resizeAnchors[2].style.cssText = `
-      left: calc(100% - 3px);
-      top: -5px;
-      cursor: nesw-resize;
-    `;
-
-    resizeAnchors[3].style.cssText = `
-      left: calc(100% - 3px);
-      top: calc(50% - 4px);
-      cursor: ew-resize;
-    `;
-
-    resizeAnchors[4].style.cssText = `
-      left: calc(100% - 3px);
-      top: calc(100% - 3px);
-      cursor: nwse-resize;
-    `;
-
-    resizeAnchors[5].style.cssText = `
-      left: calc(50% - 4px);
-      top: calc(100% - 3px);
-      cursor: ns-resize;
-    `;
-
-    resizeAnchors[6].style.cssText = `
-      left: -5px;
-      top: calc(100% - 3px);
-      cursor: nesw-resize;
-    `;
-
-    resizeAnchors[7].style.cssText = `
-      left: -5px;
-      top: calc(50% - 4px);
-      cursor: ew-resize;
-    `;
+    setHandlePoints(resizeAnchors);
 
     this.clipInfoEle = this._shadowRoot.querySelector('.clip-info');
 
@@ -511,18 +465,26 @@ export default class SZPaint extends HTMLElement {
       this.toolBarEle.style.textAlign = 'left';
       this.secondaryToolEle.style.left = '0px';
       this.secondaryToolEle.style.bottom = 'calc( 100% + 10px)';
+      this.locationMarker.style.bottom = 'calc(100%)';
+      this.locationMarker.style.transform = 'rotate(180deg)';
     } else if (location === 5) {
       this.toolBarEle.style.textAlign = 'right';
       this.secondaryToolEle.style.right = '0px';
       this.secondaryToolEle.style.bottom = 'calc( 100% + 10px)';
+      this.locationMarker.style.bottom = 'calc(100%)';
+      this.locationMarker.style.transform = 'rotate(180deg)';
     } else if (location === 6) {
       this.toolBarEle.style.textAlign = 'right';
       this.secondaryToolEle.style.right = '0px';
       this.secondaryToolEle.style.top = 'calc( 100% + 10px)';
+      this.locationMarker.style.bottom = 'unset';
+      this.locationMarker.style.transform = 'unset';
     } else if (location === 10) {
       this.toolBarEle.style.textAlign = 'left';
       this.secondaryToolEle.style.left = '0px';
       this.secondaryToolEle.style.top = 'calc( 100% + 10px)';
+      this.locationMarker.style.bottom = 'unset';
+      this.locationMarker.style.transform = 'unset';
     }
   }
 
