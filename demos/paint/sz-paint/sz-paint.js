@@ -72,6 +72,8 @@ export default class SZPaint extends HTMLElement {
 
   toolState = null;
   currToolState = null;
+  // 进入绘图阶段
+  currGraphInfo = null;
 
   resetTimeoutId = null;
   _shadowRoot = null;
@@ -87,6 +89,9 @@ export default class SZPaint extends HTMLElement {
     this._shadowRoot.addEventListener('mousedown', this.hostMouseDown.bind(this));
     this._shadowRoot.addEventListener('mouseup', this.hostMouseUp.bind(this));
     this._shadowRoot.addEventListener('mouseleave', this.hostMouseLeave.bind(this));
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    })
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -107,7 +112,7 @@ export default class SZPaint extends HTMLElement {
     return ['src'];
   }
 
-  reset() {
+  reset(callback) {
     if (!this.hostData.src) {
       return;
     }
@@ -142,6 +147,7 @@ export default class SZPaint extends HTMLElement {
         this.initEle();
         this.bindEvent();
         this.initData();
+        callback && callback();
       });
     }, 0);
   }
@@ -265,7 +271,9 @@ export default class SZPaint extends HTMLElement {
     const left = e.pageX - this.hostData.x;
     const top = e.pageY - this.hostData.y;
 
-    if (this.clipFrameBox === null) {
+    if (this.currGraphInfo) {
+
+    } else if (this.clipFrameBox === null) {
       this.refreshMousePoint(left, top);
     } else if (this.clipFrameBox !== null) {
       if (this.resizeClipFrameFn) {
@@ -295,7 +303,16 @@ export default class SZPaint extends HTMLElement {
     const x = e.pageX - this.hostData.x;
     const y = e.pageY - this.hostData.y;
 
-    if (this.clipFrameBox === null) {
+    if (e.button === 2) {
+      this.reset(() => {
+        this.refreshMousePoint(x, y);
+      });
+      return;
+    }
+
+    if (this.currToolState) {
+
+    } else if (this.clipFrameBox === null) {
       this.clipFrameBox = {
         x, y, width: 0, height: 0
       }
@@ -336,7 +353,9 @@ export default class SZPaint extends HTMLElement {
   }
 
   hostMouseUp(e) {
-    if (this.clipFrameBox !== null) {
+    if (this.currToolState) {
+
+    } else if (this.clipFrameBox !== null) {
       this.mousePointEle.style.left = '10000px';
       this.clipFrameEle.style.cursor = 'move';
       this.resizeClipFrameFn = null;
