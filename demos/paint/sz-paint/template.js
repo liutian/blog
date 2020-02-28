@@ -3,6 +3,7 @@ export const HOST_TEMPLATE = `
   <canvas class="backdrop"></canvas>
   <canvas class="persistence"></canvas>
   <canvas class="realtime"></canvas>
+  <canvas class="temp-test"></canvas>
 
   <div class="mouse-point">
     <canvas class="point-area"></canvas>

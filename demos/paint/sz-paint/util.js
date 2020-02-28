@@ -173,16 +173,29 @@ export function setHandlePoints(points) {
 }
 
 const colorObj = {
-  red: '#f00',
-  yellow: '#ff0',
-  blue: '#00f',
-  green: '#0f0',
-  gray: '#888',
-  white: '#fff'
+  red: 'rgba(255,0,0,1)',
+  yellow: 'rgba(255,255,0,1)',
+  blue: 'rgba(0,0,255,1)',
+  green: 'rgba(0,255,0,1)',
+  gray: 'rgba(128,128,128,1)',
+  white: 'rgba(255,255,255,1)'
 };
+
+const r_colorObj = {
+  '255,0,0': 'red',
+  '255,255,0': 'yellow',
+  '0,0,255': 'blue',
+  '0,255,0': 'green',
+  '128,128,128': 'gray',
+  '255,255,255': 'white'
+}
 
 export function resolveColor(color) {
   return colorObj[color];
+}
+
+export function reverseColor(colors) {
+  return r_colorObj[colors.slice(0, 3).join(',')];
 }
 
 const sizeObj = {
@@ -214,4 +227,13 @@ const sizeObj = {
 }
 export function resolveSize(type, size) {
   return sizeObj[type][size];
+}
+
+
+export function getPositionColor(imageData, x, y) {
+  if (!imageData || !imageData.data) {
+    return [];
+  }
+  const colorIndex = imageData.width * y * 4 + x * 4;
+  return imageData.data.slice(colorIndex, colorIndex + 4)
 }

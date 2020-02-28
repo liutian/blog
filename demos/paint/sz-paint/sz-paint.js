@@ -1,7 +1,7 @@
 
 import HOST_TEMPLATE from './template.js';
 import HOST_STYLE from './style.js';
-import { resizeHighOrder, moveHighOrder, fixedPositionHighOrder, setHandlePoints, resolveColor, resolveSize } from './util.js';
+import { resizeHighOrder, moveHighOrder, fixedPositionHighOrder, setHandlePoints, resolveColor, resolveSize, getPositionColor, reverseColor } from './util.js';
 
 export default class SZPaint extends HTMLElement {
 
@@ -47,6 +47,9 @@ export default class SZPaint extends HTMLElement {
   persistenceCanvas = null;
   // 当前创作区画布
   realtimeCanvas = null;
+  // 临时测试鼠标是否选择某个图形的画布
+  tempTestCanvas = null;
+  tempTestCtx = null;
   backdropCtx = null;
   pointAreaCtx = null;
   persistenceCtx = null;
@@ -79,7 +82,7 @@ export default class SZPaint extends HTMLElement {
   resetTimeoutId = null;
   _shadowRoot = null;
   graphList = [];
-
+  selectedGraph = null;
 
   constructor() {
     if (new.target !== SZPaint) {
@@ -142,6 +145,7 @@ export default class SZPaint extends HTMLElement {
       this.clipFrameBox = null;
       this.imageData = null;
       this.graphList = [];
+      this.selectedGraph = null;
 
       this.bgImage = new Image();
       this.bgImage.src = this.hostData.src;
@@ -194,6 +198,10 @@ export default class SZPaint extends HTMLElement {
     this.pointAreaCanvas = this._shadowRoot.querySelector('.point-area');
     this.pointAreaCanvas.width = this.pointAreaWidth;
     this.pointAreaCanvas.height = this.pointAreaHeight;
+
+    this.tempTestCanvas = this._shadowRoot.querySelector('.temp-test');
+    this.tempTestCanvas.width = this.hostData.width;
+    this.tempTestCanvas.height = this.hostData.height;
 
     this.pointLocationEle = this._shadowRoot.querySelector('.point-location');
     this.pointColorEle = this._shadowRoot.querySelector('.point-color');
@@ -268,6 +276,8 @@ export default class SZPaint extends HTMLElement {
     this.realtimeCtx = this.realtimeCanvas.getContext('2d');
     // this.realtimeCtx.imageSmoothingEnabled = false;
 
+    this.tempTestCtx = this.tempTestCanvas.getContext('2d');
+
     this.pointAreaCtx.imageSmoothingEnabled = false;
     this.backdropCtx.drawImage(this.bgImage, 0, 0);
     this.imageData = this.backdropCtx.getImageData(0, 0, this.hostData.width, this.hostData.height);
@@ -297,9 +307,8 @@ export default class SZPaint extends HTMLElement {
       this.refreshMousePoint(x, y);
       this.resizeClipFrame();
     } else if (this.graphList.length > 0) {
-      const imageData = this.persistenceImageData;
-      const colorIndex = imageData.width * y * 4 + x * 4;
-      if (imageData.data[colorIndex] > 0 || imageData.data[colorIndex + 1] > 0 || imageData.data[colorIndex + 2] > 0) {
+      const colors = getPositionColor(this.persistenceImageData, x, y);
+      if (colors[0] > 0 || colors[1] > 0 || colors[2] > 0) {
         this.clipFrameEle.style.cursor = 'move';
       } else {
         this.clipFrameEle.style.cursor = 'default';
@@ -329,10 +338,34 @@ export default class SZPaint extends HTMLElement {
     }
 
     if (this.currToolState) {
-      this.currGraphInfo = {
-        startX: x,
-        staryY: y,
-        ...this.currToolState
+      const selectedGraphIndex = this.getSelectedGraphIndex(x, y);
+      if (this.selectedGraph) {
+        if (selectedGraphIndex !== -1) {
+          [this.currGraphInfo] = this.graphList.splice(selectedGraphIndex, 1);
+          this.graphList.push(this.selectedGraph);
+
+          this.persistenceCtx.clearRect(0, 0, this.hostData.width, this.hostData.height);
+          this.graphList.forEach(item => {
+            this.render(item, this.persistenceCtx);
+          });
+          this.render(this.currGraphInfo, this.realtimeCtx);
+
+          this.selectedGraph = this.currGraphInfo;
+        }
+      } else if (selectedGraphIndex !== -1) {
+        [this.currGraphInfo] = this.graphList.splice(selectedGraphIndex, 1);
+        this.persistenceCtx.clearRect(0, 0, this.hostData.width, this.hostData.height);
+        this.graphList.forEach(item => {
+          this.render(item, this.persistenceCtx);
+        });
+        this.render(this.currGraphInfo, this.realtimeCtx);
+        this.selectedGraph = this.currGraphInfo;
+      } else {
+        this.currGraphInfo = {
+          startX: x,
+          staryY: y,
+          ...this.currToolState
+        }
       }
     } else if (this.clipFrameBox === null) {
       this.clipFrameBox = {
@@ -584,8 +617,8 @@ export default class SZPaint extends HTMLElement {
     this.mousePointEle.style.left = (left + this.mousePointOffset) + 'px';
     this.mousePointEle.style.top = (top + this.mousePointOffset) + 'px';
     this.pointLocationEle.textContent = `(${left},${top})`;
-    const imageDataStartIndex = this.imageData.width * top * 4 + left * 4;
-    this.pointColorEle.textContent = `(${this.imageData.data[imageDataStartIndex]},${this.imageData.data[imageDataStartIndex + 1]},${this.imageData.data[imageDataStartIndex + 2]})`;
+    const colors = getPositionColor(this.imageData, left, top);
+    this.pointColorEle.textContent = `(${colors[0]},${colors[1]},${colors[2]})`;
 
     this.pointAreaCtx.fillStyle = '#000000';
     this.pointAreaCtx.fillRect(0, 0, this.pointAreaWidth, this.pointAreaHeight);
@@ -620,7 +653,6 @@ export default class SZPaint extends HTMLElement {
     });
   }
 
-
   refreshGraph(refresh, ctx) {
     const graphInfo = {
       width: this.currGraphInfo.endX - this.currGraphInfo.startX,
@@ -654,6 +686,35 @@ export default class SZPaint extends HTMLElement {
       ctx.strokeRect(data.startX + diff, data.staryY + diff, data.width, data.height);
     }
     ctx.restore();
+  }
+
+  getSelectedGraphIndex(x, y) {
+    const colors = getPositionColor(this.persistenceImageData, x, y);
+    if (colors.reduce((total, curr) => total + curr, 0) === 0) {
+      return -1;
+    }
+
+    const color = reverseColor(colors);
+    const matchGraphIndexs = this.graphList.reduce((arr, item, index) => {
+      if (item.color === color) {
+        arr.push(index);
+      }
+      return arr;
+    }, []);
+    let selectedGraphIndex = null;
+
+    this.tempTestCtx.save();
+    matchGraphIndexs.forEach((index) => {
+      this.tempTestCtx.clearRect(0, 0, this.hostData.width, this.hostData.height);
+      this.render(this.graphList[index], this.tempTestCtx);
+      const imageData = this.tempTestCtx.getImageData(x, y, 1, 1);
+      if (imageData.data[0] === colors[0] && imageData.data[1] === colors[1] && imageData.data[2] === colors[2]) {
+        selectedGraphIndex = index;
+      }
+    });
+    this.tempTestCtx.restore();
+
+    return selectedGraphIndex;
   }
 }
 
