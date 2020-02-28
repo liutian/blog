@@ -33,7 +33,7 @@ export const HOST_TEMPLATE = `
       <span class="graph-tool tool-item" data-type="mosaic">糊</span>
       <span class="graph-tool tool-item" data-type="font">字</span>
       <span class="separator"></span>
-      <span class="cancel-tool tool-item" >消</span>
+      <span class="undo-tool tool-item" >消</span>
       <span class="save-tool tool-item" >保</span>
       <span class="separator tool-item"></span>
       <span class="exit-tool tool-item" >退</span>

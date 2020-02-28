@@ -1,7 +1,7 @@
 
 import HOST_TEMPLATE from './template.js';
 import HOST_STYLE from './style.js';
-import { resizeHighOrder, moveHighOrder, fixedPositionHighOrder, setHandlePoints } from './util.js';
+import { resizeHighOrder, moveHighOrder, fixedPositionHighOrder, setHandlePoints, resolveColor, resolveSize } from './util.js';
 
 export default class SZPaint extends HTMLElement {
 
@@ -64,6 +64,7 @@ export default class SZPaint extends HTMLElement {
   clipFrameBox = null;
 
   imageData = null;
+  persistenceImageData = null;
   bgImage = null;
 
   resizeClipFrameFn = null;
@@ -77,6 +78,8 @@ export default class SZPaint extends HTMLElement {
 
   resetTimeoutId = null;
   _shadowRoot = null;
+  graphList = [];
+
 
   constructor() {
     if (new.target !== SZPaint) {
@@ -138,6 +141,7 @@ export default class SZPaint extends HTMLElement {
       this.posToolBarFn = null;
       this.clipFrameBox = null;
       this.imageData = null;
+      this.graphList = [];
 
       this.bgImage = new Image();
       this.bgImage.src = this.hostData.src;
@@ -239,6 +243,10 @@ export default class SZPaint extends HTMLElement {
     this.fontSizeToolEle.addEventListener('change', (e) => {
       this.currToolState.size = this.toolState.font.size = e.target.value;
     });
+    this._shadowRoot.querySelectorAll('.resize-anchor').forEach((item) => {
+      item.addEventListener('mousedown', this.resizeAnchorMouseDown.bind(this));
+    });
+    this.clipFrameEle.addEventListener('mousedown', this.clipFrameMouseDown.bind(this));
   }
 
   /**
@@ -258,6 +266,7 @@ export default class SZPaint extends HTMLElement {
     this.backdropCtx = this.backdropCanvas.getContext('2d', { alpha: false });
     this.persistenceCtx = this.persistenceCanvas.getContext('2d');
     this.realtimeCtx = this.realtimeCanvas.getContext('2d');
+    // this.realtimeCtx.imageSmoothingEnabled = false;
 
     this.pointAreaCtx.imageSmoothingEnabled = false;
     this.backdropCtx.drawImage(this.bgImage, 0, 0);
@@ -268,34 +277,43 @@ export default class SZPaint extends HTMLElement {
   }
 
   hostMouseMove(e) {
-    const left = e.pageX - this.hostData.x;
-    const top = e.pageY - this.hostData.y;
+    const x = e.pageX - this.hostData.x;
+    const y = e.pageY - this.hostData.y;
+
 
     if (this.currGraphInfo) {
+      this.currGraphInfo.endX = x;
+      this.currGraphInfo.endY = y;
+      this.refreshGraph(true, this.realtimeCtx);
+    } else if (this.resizeClipFrameFn) {
+      ({
+        x: this.clipFrameBox.x,
+        y: this.clipFrameBox.y,
+        width: this.clipFrameBox.width,
+        height: this.clipFrameBox.height
+      } = this.resizeClipFrameFn(x, y));
 
-    } else if (this.clipFrameBox === null) {
-      this.refreshMousePoint(left, top);
-    } else if (this.clipFrameBox !== null) {
-      if (this.resizeClipFrameFn) {
-        ({
-          x: this.clipFrameBox.x,
-          y: this.clipFrameBox.y,
-          width: this.clipFrameBox.width,
-          height: this.clipFrameBox.height
-        } = this.resizeClipFrameFn(left, top));
-
-        this.refreshClipInfo();
-        this.refreshMousePoint(left, top);
-        this.resizeClipFrame();
-      } else if (this.moveClipFrameFn) {
-        ({
-          x: this.clipFrameBox.x,
-          y: this.clipFrameBox.y
-        } = this.moveClipFrameFn(left, top));
-
-        this.refreshClipInfo();
-        this.moveClipFrame();
+      this.refreshClipInfo();
+      this.refreshMousePoint(x, y);
+      this.resizeClipFrame();
+    } else if (this.graphList.length > 0) {
+      const imageData = this.persistenceImageData;
+      const colorIndex = imageData.width * y * 4 + x * 4;
+      if (imageData.data[colorIndex] > 0 || imageData.data[colorIndex + 1] > 0 || imageData.data[colorIndex + 2] > 0) {
+        this.clipFrameEle.style.cursor = 'move';
+      } else {
+        this.clipFrameEle.style.cursor = 'default';
       }
+    } else if (this.clipFrameBox === null) {
+      this.refreshMousePoint(x, y);
+    } else if (this.moveClipFrameFn) {
+      ({
+        x: this.clipFrameBox.x,
+        y: this.clipFrameBox.y
+      } = this.moveClipFrameFn(x, y));
+
+      this.refreshClipInfo();
+      this.moveClipFrame();
     }
   }
 
@@ -311,7 +329,11 @@ export default class SZPaint extends HTMLElement {
     }
 
     if (this.currToolState) {
-
+      this.currGraphInfo = {
+        startX: x,
+        staryY: y,
+        ...this.currToolState
+      }
     } else if (this.clipFrameBox === null) {
       this.clipFrameBox = {
         x, y, width: 0, height: 0
@@ -327,35 +349,52 @@ export default class SZPaint extends HTMLElement {
       this.posToolBarFn = fixedPositionHighOrder(
         this.hostData.width, this.hostData.height, this.primaryToolWidth,
         this.primaryToolHeight + this.secondaryToolHeight + 10, this.secondaryToolHeight, 5);
-    } else if (this.clipFrameBox !== null) {
-      const classList = e.target.classList;
-      this.toolBarEle.hidden = true;
-
-      if (classList.contains('resize-anchor')) {
-        this.resizeClipFrameFn = resizeHighOrder({
-          index: +e.target.dataset.index,
-          rectX: this.clipFrameBox.x,
-          rectY: this.clipFrameBox.y,
-          rectWidth: this.clipFrameBox.width,
-          rectHeight: this.clipFrameBox.height,
-        });
-      } else if (e.target === this.clipFrameEle) {
-        this.moveClipFrameFn = moveHighOrder({
-          offsetX: x - this.clipFrameBox.x,
-          offsetY: y - this.clipFrameBox.y,
-          rectWidth: this.clipFrameBox.width,
-          rectHeight: this.clipFrameBox.height,
-          hostWidth: this.hostData.width,
-          hostHeight: this.hostData.height
-        });
-      }
     }
   }
 
-  hostMouseUp(e) {
-    if (this.currToolState) {
+  resizeAnchorMouseDown(e) {
+    this.toolBarEle.hidden = true;
+    this.resizeClipFrameFn = resizeHighOrder({
+      index: +e.target.dataset.index,
+      rectX: this.clipFrameBox.x,
+      rectY: this.clipFrameBox.y,
+      rectWidth: this.clipFrameBox.width,
+      rectHeight: this.clipFrameBox.height,
+    });
+    e.stopPropagation();
+  }
 
-    } else if (this.clipFrameBox !== null) {
+  clipFrameMouseDown(e) {
+    if (this.currToolState) {
+      return;
+    }
+
+    const x = e.pageX - this.hostData.x;
+    const y = e.pageY - this.hostData.y;
+
+    this.toolBarEle.hidden = true;
+    this.moveClipFrameFn = moveHighOrder({
+      offsetX: x - this.clipFrameBox.x,
+      offsetY: y - this.clipFrameBox.y,
+      rectWidth: this.clipFrameBox.width,
+      rectHeight: this.clipFrameBox.height,
+      hostWidth: this.hostData.width,
+      hostHeight: this.hostData.height
+    });
+    e.stopPropagation();
+  }
+
+  hostMouseUp(e) {
+    const x = e.pageX - this.hostData.x;
+    const y = e.pageY - this.hostData.y;
+
+    if (this.currGraphInfo) {
+      this.currGraphInfo.endX = x;
+      this.currGraphInfo.endY = y;
+      this.refreshGraph(false, this.persistenceCtx);
+      this.realtimeCtx.clearRect(0, 0, this.hostData.width, this.hostData.height);
+      this.currGraphInfo = null;
+    } else if (this.resizeClipFrameFn !== null || this.moveClipFrameFn !== null) {
       this.mousePointEle.style.left = '10000px';
       this.clipFrameEle.style.cursor = 'move';
       this.resizeClipFrameFn = null;
@@ -384,6 +423,8 @@ export default class SZPaint extends HTMLElement {
         e.target.classList.add('active');
         this.switchTool(e.target.dataset.type);
       }
+    } else if (classList.contains('undo-tool')) {
+      this.undoToolClick(e);
     } else {
       this.switchTool();
     }
@@ -532,7 +573,6 @@ export default class SZPaint extends HTMLElement {
     }
   }
 
-
   moveClipFrame() {
     this.clipFrameEle.style.left = `${this.clipFrameBox.x}px`;
     this.clipFrameEle.style.top = `${this.clipFrameBox.y}px`;
@@ -566,6 +606,54 @@ export default class SZPaint extends HTMLElement {
     this.pointAreaCtx.moveTo(0, Math.floor(this.pointAreaHeight / 2) + 0.5);
     this.pointAreaCtx.lineTo(this.pointAreaWidth, Math.floor(this.pointAreaHeight / 2) + 0.5);
     this.pointAreaCtx.stroke();
+  }
+
+  undoToolClick(e) {
+    if (this.graphList.length <= 0) {
+      return;
+    }
+
+    this.graphList.pop();
+    this.persistenceCtx.clearRect(0, 0, this.hostData.width, this.hostData.height);
+    this.graphList.forEach((item) => {
+      this.render(item, this.persistenceCtx);
+    });
+  }
+
+
+  refreshGraph(refresh, ctx) {
+    const graphInfo = {
+      width: this.currGraphInfo.endX - this.currGraphInfo.startX,
+      height: this.currGraphInfo.endY - this.currGraphInfo.staryY,
+      ...this.currGraphInfo
+    }
+
+    if (refresh) {
+      ctx.clearRect(0, 0, this.hostData.width, this.hostData.height);
+    } else {
+      this.graphList.push(graphInfo);
+    }
+
+    this.render(graphInfo, ctx);
+
+    if (!refresh) {
+      this.persistenceImageData = ctx.getImageData(0, 0, this.hostData.width, this.hostData.height);
+    }
+  }
+
+  render(data, ctx) {
+    ctx.save();
+    if (data.type === 'rect') {
+      const size = resolveSize(data.type, data.size);
+      const diff = size % 2 === 0 ? 0 : 0.5;
+
+      ctx.strokeStyle = resolveColor(data.color);
+      ctx.lineWidth = size;
+      ctx.lineJoin = 'round';
+
+      ctx.strokeRect(data.startX + diff, data.staryY + diff, data.width, data.height);
+    }
+    ctx.restore();
   }
 }
 

@@ -171,3 +171,47 @@ export function setHandlePoints(points) {
     cursor: ew-resize;
   `;
 }
+
+const colorObj = {
+  red: '#f00',
+  yellow: '#ff0',
+  blue: '#00f',
+  green: '#0f0',
+  gray: '#888',
+  white: '#fff'
+};
+
+export function resolveColor(color) {
+  return colorObj[color];
+}
+
+const sizeObj = {
+  rect: {
+    small: 1,
+    normal: 3,
+    large: 6
+  },
+  circular: {
+    small: 1,
+    normal: 3,
+    large: 4
+  },
+  arrow: {
+    small: 1,
+    normal: 3,
+    large: 4
+  },
+  paint: {
+    small: 1,
+    normal: 3,
+    large: 4
+  },
+  mosaic: {
+    small: 1,
+    normal: 3,
+    large: 4
+  }
+}
+export function resolveSize(type, size) {
+  return sizeObj[type][size];
+}
