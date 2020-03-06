@@ -123,3 +123,14 @@
       - 创建根组件 `TView` `LView`
       - 创建根组件类实例
     - 进行首次变更检测 `tick()`
+
+### 功能列表
+- 组件依赖注入
+- 组件生命周期
+- 组件属性变更同步机制
+- 组件事件
+- 组件元素查询机制
+- hostBinding hostListener
+- ng-template
+- ng-content
+- ng-container
