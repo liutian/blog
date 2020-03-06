@@ -209,9 +209,12 @@ export default class Paint extends UIElement {
       const toolBarRenderData = this.posToolBarFn(this.clipFrameBox.x, this.clipFrameBox.y, this.clipFrameBox.width, this.clipFrameBox.height);
       this.toolBarEle.render(toolBarRenderData);
     } else if (this.flag & DrawFlag) {
-      this.graphInfoList.push(this.currGraphInfo);
-
-      this.saveGraphInfo();
+      const diffX = Math.abs(this.currGraphInfo.startX - this.currGraphInfo.endX);
+      const diffY = Math.abs(this.currGraphInfo.startY - this.currGraphInfo.endY);
+      if (diffX > 4 || diffY > 4) {
+        this.graphInfoList.push(this.currGraphInfo);
+        this.saveGraphInfo();
+      }
 
       this.flag &= ~DrawFlag;
       this.flag |= DrawReadyFlag;
@@ -293,7 +296,7 @@ export default class Paint extends UIElement {
     if (this.graphInfoHistoryCursor >= 0) {
       this.graphInfoHistoryCursor -= 1;
       this.graphInfoList = this.graphInfoHistoryCursor === -1 ? [] : [...this.graphInfoHistory[this.graphInfoHistoryCursor]];
-      this.canvasRender.draw(this.persistenceCtx, this.graphInfoList);
+      this.drawPersistence();
       this.canvasRender.draw(this.realtimeCtx, []);
 
       if (this.graphInfoHistoryCursor === 0) {
@@ -305,9 +308,7 @@ export default class Paint extends UIElement {
   }
 
   saveGraphInfo() {
-    this.canvasRender.draw(this.persistenceCtx, this.graphInfoList);
-    this.persistenceImageData = this.persistenceCtx.getImageData(0, 0, this.hostWidth, this.hostHeight);
-    this.clipFrameEle.setInputData({ imageData: this.persistenceImageData });
+    this.drawPersistence();
     this.canvasRender.draw(this.realtimeCtx, []);
 
     if (this.graphInfoHistoryCursor !== this.graphInfoHistory.length - 1) {
@@ -315,6 +316,12 @@ export default class Paint extends UIElement {
     }
     this.graphInfoHistory.push([...this.graphInfoList]);
     this.graphInfoHistoryCursor = this.graphInfoHistory.length - 1;
+  }
+
+  drawPersistence() {
+    this.canvasRender.draw(this.persistenceCtx, this.graphInfoList);
+    this.persistenceImageData = this.persistenceCtx.getImageData(0, 0, this.hostWidth, this.hostHeight);
+    this.clipFrameEle.setInputData({ imageData: this.persistenceImageData, graphInfoList: this.graphInfoList });
   }
 
   clearView() {

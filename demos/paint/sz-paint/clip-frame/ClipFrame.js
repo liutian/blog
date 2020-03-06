@@ -60,9 +60,13 @@ export default class ClipFrame extends UIElement {
         const pointY = e.pageY - this.inputData.containerY;
         const graphIndex = this.detectGraphIndex(pointX, pointY);
         if (graphIndex !== -1) {
-          this.dispatchEvent(new CustomEvent('select', {
-            detail: graphIndex
-          }));
+          if (this.inputData.graphInfoList[graphIndex].selected !== true) {
+            this.inputData.graphInfoList.forEach(item => item.selected = false);
+            this.inputData.graphInfoList[graphIndex].selected = true;
+            this.dispatchEvent(new CustomEvent('select', {
+              detail: graphIndex
+            }));
+          }
           return;
         }
       }

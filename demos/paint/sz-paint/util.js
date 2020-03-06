@@ -136,7 +136,7 @@ export function installListener(list) {
 
 export function getPositionColor(imageData, x, y) {
   if (!imageData || !imageData.data) {
-    return [];
+    return [0, 0, 0, 0];
   }
   const colorIndex = imageData.width * y * 4 + x * 4;
   return imageData.data.slice(colorIndex, colorIndex + 4)
