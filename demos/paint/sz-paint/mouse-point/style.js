@@ -16,6 +16,7 @@ const HOST_STYLE = `
     font-size: 12px;
     box-sizing: border-box;
     user-select: none;
+    margin-top: -4px;
   }
 `;
 

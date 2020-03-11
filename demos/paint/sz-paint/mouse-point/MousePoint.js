@@ -39,8 +39,8 @@ export default class MousePoint extends UIElement {
     this.pointAreaCtx.drawImage(originCanvas, pointX - 20, pointY - 15, 40, 30, 0, 0, pointAreaWidth, pointAreaHeight);
 
     this.pointAreaCtx.strokeStyle = '#00ccff';
-    this.pointAreaCtx.lineWidth = 2;
-    this.pointAreaCtx.strokeRect(0, 0, pointAreaWidth, pointAreaHeight + 1);
+    this.pointAreaCtx.lineWidth = 1;
+    this.pointAreaCtx.strokeRect(0.5, 0.5, pointAreaWidth - 1, pointAreaHeight - 1);
 
     this.pointAreaCtx.lineWidth = 1;
 
