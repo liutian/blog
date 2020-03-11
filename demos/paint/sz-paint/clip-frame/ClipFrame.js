@@ -1,8 +1,9 @@
 import { UIElement } from '../UIElement.js';
-import { installListener, getPositionColor, initCanvas } from '../util.js';
+import { installListener, getPositionAreaColors, initCanvas } from '../util.js';
 import { setHandlePoints, reverseColor } from '../tool.js';
 import CanvasRender from '../CanvasRender.js';
 
+const positionDetectOffset = 2;
 export default class ClipFrame extends UIElement {
   clipInfoEle = null;
   detectCanvas = null;
@@ -43,8 +44,9 @@ export default class ClipFrame extends UIElement {
 
       const pointX = e.pageX - this.inputData.containerX;
       const pointY = e.pageY - this.inputData.containerY;
-      const colors = getPositionColor(this.inputData.imageData, pointX, pointY);
-      if (colors[0] > 0 || colors[1] > 0 || colors[2] > 0) {
+      const colors = getPositionAreaColors(this.inputData.imageData, pointX, pointY, positionDetectOffset);
+      const colorDetect = colors.some(c => c[0] > 0 || c[1] > 0 || c[2] > 0);
+      if (colorDetect) {
         this.style.cursor = 'move';
       } else {
         this.style.cursor = 'default';
@@ -106,28 +108,36 @@ export default class ClipFrame extends UIElement {
   }
 
   detectGraphIndex(x, y) {
-    const colors = getPositionColor(this.inputData.imageData, x, y);
-    if (colors.reduce((total, curr) => total + curr, 0) === 0) {
+    let colors = getPositionAreaColors(this.inputData.imageData, x, y, positionDetectOffset)
+      .filter(c => c[0] > 0 || c[1] > 0 || c[2] > 0);
+    if (colors.length === 0) {
       return -1;
     }
 
-    const color = reverseColor(colors);
-    const matchGraphIndexs = this.inputData.graphInfoList.reduce((arr, item, index) => {
-      if (item.color === color) {
+    let matchGraphIndexs = [];
+    let graphIndex = -1;
+    colors = [...new Set(colors.map(c => reverseColor(c)))];
+    matchGraphIndexs = this.inputData.graphInfoList.reduce((arr, item, index) => {
+      if (colors.includes(item.color) && !arr.includes(index)) {
         arr.push(index);
       }
       return arr;
-    }, []);
-    let graphIndex = -1;
+    }, matchGraphIndexs).sort((a, b) => {
+      return a > b ? -1 : 1;
+    });
 
     this.detectCtx.save();
-    matchGraphIndexs.forEach((index) => {
+    for (let i = 0; i < matchGraphIndexs.length; i++) {
+      const index = matchGraphIndexs[i];
       this.canvasRender.draw(this.detectCtx, [this.inputData.graphInfoList[index]]);
-      const imageData = this.detectCtx.getImageData(x, y, 1, 1);
-      if (imageData.data[0] === colors[0] && imageData.data[1] === colors[1] && imageData.data[2] === colors[2]) {
+      const imageData = this.detectCtx.getImageData(x - positionDetectOffset, y - positionDetectOffset, positionDetectOffset * 2 + 1, positionDetectOffset * 2 + 1);
+      const colorDetect = getPositionAreaColors(imageData, positionDetectOffset, positionDetectOffset)
+        .some(c => c[0] > 0 || c[1] > 0 || c[2] > 0);
+      if (colorDetect) {
         graphIndex = index;
+        break;
       }
-    });
+    }
     this.detectCtx.restore();
 
     return graphIndex;

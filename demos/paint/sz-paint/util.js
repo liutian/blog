@@ -138,8 +138,33 @@ export function getPositionColor(imageData, x, y) {
   if (!imageData || !imageData.data) {
     return [0, 0, 0, 0];
   }
+  if (x < 0 || y < 0 || x >= imageData.width || y >= imageData.height) {
+    return [0, 0, 0, 0];
+  }
+
   const colorIndex = imageData.width * y * 4 + x * 4;
   return imageData.data.slice(colorIndex, colorIndex + 4)
+}
+
+export function getPositionAreaColors(imageData, x, y, offset = 2) {
+  let colors = [];
+  if (!imageData || !imageData.data) {
+    return colors;
+  }
+
+  for (let i = x - offset, j = y - offset; ;) {
+    const color = getPositionColor(imageData, i, j);
+    colors.push(color);
+    i++;
+    if (i > x + offset) {
+      i = x - offset;
+      j++;
+    }
+    if (j > y + offset) {
+      break;
+    }
+  }
+  return colors;
 }
 
 export function initCanvas(container, selector, width, height) {
