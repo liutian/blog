@@ -167,6 +167,12 @@ export function getPositionAreaColors(imageData, x, y, offset = 2) {
   return colors;
 }
 
+export function detectPositionAnchor(x, y, width, height, posX, posY, size) {
+  return getAnchors(x, y, width, height).findIndex(([anchorX, anchorY]) => {
+    return posX >= anchorX - size && posX <= anchorX + size && posY >= anchorY - size && posY <= anchorY + size;
+  });
+}
+
 export function initCanvas(container, selector, width, height) {
   const canvas = container.querySelector(selector);
   canvas.width = width;
@@ -187,4 +193,20 @@ export function loadImage(src) {
   });
 }
 
+export function getAnchors(x, y, width, height) {
+  return [
+    [x, y],
+    [x + width / 2, y],
+    [x + width, y],
+    [x + width, y + height / 2],
+    [x + width, y + height],
+    [x + width / 2, y + height],
+    [x, y + height],
+    [x, y + height / 2],
+  ]
+}
 
+const cursor = ['nw-resize', 'n-resize', 'ne-resize', 'e-resize', 'se-resize', 's-resize', 'sw-resize', 'w-resize'];
+export function parseCursor(index) {
+  return cursor[index];
+}
