@@ -277,7 +277,7 @@ export default class Paint extends UIElement {
     this.graphInfoList.forEach(item => item.select = false);
     selectGraphInfo.select = true;
 
-    this.saveGraphInfo();
+    // this.saveGraphInfo();
     this.graphInfoList.pop();
     this.drawPersistence();
     this.canvasRender.draw(this.realtimeCtx, [selectGraphInfo]);
@@ -356,9 +356,12 @@ export default class Paint extends UIElement {
   toolBarUndoListener = (e) => {
     if (this.graphInfoHistoryCursor >= 0) {
       this.graphInfoHistoryCursor -= 1;
-      this.graphInfoList = this.graphInfoHistoryCursor === -1 ? [] : [...this.graphInfoHistory[this.graphInfoHistoryCursor]];
+      const list = this.graphInfoHistory[this.graphInfoHistoryCursor];
+      this.graphInfoList = this.graphInfoHistoryCursor === -1 ? [] : list.map(graph => ({ ...graph }));
       this.drawPersistence();
       this.canvasRender.draw(this.realtimeCtx, []);
+      console.log('graphInfoHistory' + this.graphInfoHistory.length);
+      console.log('graphInfoHistoryCursor: ' + this.graphInfoHistoryCursor);
 
       if (this.graphInfoHistoryCursor === 0) {
         this.flag = 0;
@@ -375,7 +378,9 @@ export default class Paint extends UIElement {
     if (this.graphInfoHistoryCursor !== this.graphInfoHistory.length - 1) {
       this.graphInfoHistory.length = this.graphInfoHistoryCursor + 1;
     }
-    this.graphInfoHistory.push([...this.graphInfoList]);
+    const list = this.graphInfoList.map(graph => ({ ...graph, select: false }));
+    this.graphInfoHistory.push(list);
+    console.log(list);
     this.graphInfoHistoryCursor = this.graphInfoHistory.length - 1;
   }
 
