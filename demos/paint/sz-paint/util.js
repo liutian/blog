@@ -154,7 +154,9 @@ export function getPositionAreaColors(imageData, x, y, offset = 2) {
 
   for (let i = x - offset, j = y - offset; ;) {
     const color = getPositionColor(imageData, i, j);
-    colors.push(color);
+    if (color[3] !== 0 && (color[0] !== 0 || color[1] !== 0 || color[2] !== 0)) {
+      colors.push(color);
+    }
     i++;
     if (i > x + offset) {
       i = x - offset;

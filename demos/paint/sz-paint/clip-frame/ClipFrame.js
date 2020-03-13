@@ -1,5 +1,5 @@
 import { UIElement } from '../UIElement.js';
-import { installListener, getPositionAreaColors, initCanvas } from '../util.js';
+import { installListener, getPositionAreaColors, initCanvas, parseCursor, detectPositionAnchor } from '../util.js';
 import { setHandlePoints, reverseColor } from '../tool.js';
 import CanvasRender from '../CanvasRender.js';
 
@@ -10,12 +10,13 @@ export default class ClipFrame extends UIElement {
   detectCtx = null;
   canvasRender = new CanvasRender();
   inputData = {
-    drawEnableFlag: false,
+    moveEnableFlag: false,
     imageData: null,
     containerX: 0,
     containerY: 0,
-    graphInfoList: []
-  }
+    graphInfoList: [],
+    hoverFlag: false
+  };
 
   initView() {
     const resizeAnchors = this.queryAll('.resize-anchor');
@@ -27,7 +28,7 @@ export default class ClipFrame extends UIElement {
   bindEvent() {
     this.unbindEventFn = installListener([
       [this._shadowRoot, 'mousedown', this.hostMouseDownListener],
-      [this._shadowRoot, 'mousemove', this.hostMouseMoveListener]
+      [this._shadowRoot, 'mousemove', this.hostMouseMoveListener],
     ]);
   }
 
@@ -37,17 +38,23 @@ export default class ClipFrame extends UIElement {
   }
 
   hostMouseMoveListener = (e) => {
-    if (this.inputData.drawEnableFlag) {
+    if (this.inputData.hoverFlag) {
       if (!this.inputData.imageData) {
         return;
       }
 
       const pointX = e.pageX - this.inputData.containerX;
       const pointY = e.pageY - this.inputData.containerY;
-      const colors = getPositionAreaColors(this.inputData.imageData, pointX, pointY, positionDetectOffset);
-      const colorDetect = colors.some(c => c[0] > 0 || c[1] > 0 || c[2] > 0);
-      if (colorDetect) {
+      const [graphIndex, anchorIndex] = this.detectGraphIndex(pointX, pointY);
+
+      // 考虑锚点颜色和本身颜色不同
+      if (graphIndex !== -1) {
         this.style.cursor = 'move';
+
+        if (anchorIndex !== -1) {
+          this.style.cursor = parseCursor(anchorIndex);
+        }
+
       } else {
         this.style.cursor = 'default';
       }
@@ -55,18 +62,42 @@ export default class ClipFrame extends UIElement {
   }
 
   hostMouseDownListener = (e) => {
-    if (this.inputData.drawEnableFlag) {
+    if (e.target.classList.contains('resize-anchor')) {
       e.stopPropagation();
+      this.dispatchEvent(new CustomEvent('resize', {
+        detail: e.target.dataset.index
+      }));
+    } else if (this.inputData.moveEnableFlag) {
+      e.stopPropagation();
+      const pointX = e.pageX - this.inputData.containerX;
+      const pointY = e.pageY - this.inputData.containerY;
+      this.dispatchEvent(new CustomEvent('move', { detail: { x: pointX, y: pointY } }));
+    } else {
+      e.stopPropagation();
+
       if (this.inputData.imageData) {
         const pointX = e.pageX - this.inputData.containerX;
         const pointY = e.pageY - this.inputData.containerY;
-        const graphIndex = this.detectGraphIndex(pointX, pointY);
+        const [graphIndex, anchorIndex] = this.detectGraphIndex(pointX, pointY);
         if (graphIndex !== -1) {
-          if (this.inputData.graphInfoList[graphIndex].selected !== true) {
-            this.inputData.graphInfoList.forEach(item => item.selected = false);
-            this.inputData.graphInfoList[graphIndex].selected = true;
+          this.style.cursor = 'move';
+          const graph = this.inputData.graphInfoList[graphIndex];
+
+          if (graph.select !== true) {
+            // 移动
             this.dispatchEvent(new CustomEvent('select', {
-              detail: graphIndex
+              detail: { graphIndex, x: pointX, y: pointY },
+            }));
+          } else if (anchorIndex !== -1) {
+            this.style.cursor = parseCursor(anchorIndex);
+            // 缩放
+            this.dispatchEvent(new CustomEvent('select', {
+              detail: { graphIndex, anchorIndex }
+            }));
+          } else {
+            // 移动
+            this.dispatchEvent(new CustomEvent('select', {
+              detail: { graphIndex, x: pointX, y: pointY }
             }));
           }
           return;
@@ -76,16 +107,6 @@ export default class ClipFrame extends UIElement {
       const pointX = e.pageX - this.inputData.containerX;
       const pointY = e.pageY - this.inputData.containerY;
       this.dispatchEvent(new CustomEvent('draw', { detail: { x: pointX, y: pointY } }));
-    } else if (e.target.classList.contains('resize-anchor')) {
-      e.stopPropagation();
-      this.dispatchEvent(new CustomEvent('resize', {
-        detail: e.target.dataset.index
-      }));
-    } else {
-      e.stopPropagation();
-      const pointX = e.pageX - this.inputData.containerX;
-      const pointY = e.pageY - this.inputData.containerY;
-      this.dispatchEvent(new CustomEvent('move', { detail: { x: pointX, y: pointY } }));
     }
   }
 
@@ -108,17 +129,19 @@ export default class ClipFrame extends UIElement {
   }
 
   detectGraphIndex(x, y) {
-    let colors = getPositionAreaColors(this.inputData.imageData, x, y, positionDetectOffset)
-      .filter(c => c[0] > 0 || c[1] > 0 || c[2] > 0);
+    let colors = getPositionAreaColors(this.inputData.imageData, x, y, positionDetectOffset);
     if (colors.length === 0) {
-      return -1;
+      return [-1, -1];
     }
 
     let matchGraphIndexs = [];
     let graphIndex = -1;
+    let anchorIndex = -1;
     colors = [...new Set(colors.map(c => reverseColor(c)))];
     matchGraphIndexs = this.inputData.graphInfoList.reduce((arr, item, index) => {
       if (colors.includes(item.color) && !arr.includes(index)) {
+        arr.push(index);
+      } else if (item.select) {
         arr.push(index);
       }
       return arr;
@@ -129,17 +152,27 @@ export default class ClipFrame extends UIElement {
     this.detectCtx.save();
     for (let i = 0; i < matchGraphIndexs.length; i++) {
       const index = matchGraphIndexs[i];
-      this.canvasRender.draw(this.detectCtx, [this.inputData.graphInfoList[index]]);
+      const graph = this.inputData.graphInfoList[index];
+      if (graph.select) {
+        const _anchorIndex = detectPositionAnchor(graph.startX, graph.startY, graph.width, graph.height, x, y, 5);
+        if (_anchorIndex !== -1) {
+          graphIndex = index;
+          anchorIndex = _anchorIndex;
+          break;
+        }
+      }
+
+      this.canvasRender.draw(this.detectCtx, [graph]);
       const imageData = this.detectCtx.getImageData(x - positionDetectOffset, y - positionDetectOffset, positionDetectOffset * 2 + 1, positionDetectOffset * 2 + 1);
-      const colorDetect = getPositionAreaColors(imageData, positionDetectOffset, positionDetectOffset)
-        .some(c => c[0] > 0 || c[1] > 0 || c[2] > 0);
-      if (colorDetect) {
+      const colors = getPositionAreaColors(imageData, positionDetectOffset, positionDetectOffset);
+      if (colors.length > 0) {
         graphIndex = index;
+        anchorIndex = -1;
         break;
       }
     }
     this.detectCtx.restore();
 
-    return graphIndex;
+    return [graphIndex, anchorIndex];
   }
 }

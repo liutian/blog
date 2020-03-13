@@ -29,7 +29,7 @@ export default class CanvasRender {
 
 
       ctx.save();
-      if (graphInfo.handle) {
+      if (graphInfo.select) {
         ctx.strokeStyle = color
         ctx.lineWidth = 1;
         ctx.strokeRect(posX, posY, width, height);

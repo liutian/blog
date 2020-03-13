@@ -9,7 +9,7 @@ const DrawReadyFlag = 16;
 const DrawFlag = 32;
 const SelectGraphFlag = 64;
 const ResizeGraphFlag = 128;
-const MovieGraphFlag = 256;
+const MoveGraphFlag = 256;
 
 export default class Paint extends UIElement {
   mousePointEle = null;
@@ -23,6 +23,8 @@ export default class Paint extends UIElement {
   hostY = 0;
   resizeClipFrameFn = null;
   moveClipFrameFn = null;
+  resizeGraphFn = null;
+  moveGraphFn = null;
   clipFrameBox = null;
   currGraphState = null;
   currGraphInfo = null;
@@ -159,7 +161,7 @@ export default class Paint extends UIElement {
     const pointX = e.pageX - this.hostX;
     const pointY = e.pageY - this.hostY;
 
-    // 邮件重装
+    // 右键重置
     if (e.button === 2) {
       this.clearView();
       this.mousePointEle.render({ pointX, pointY, imageData: this.imageData, originCanvas: this.backdropCanvas });
@@ -189,9 +191,21 @@ export default class Paint extends UIElement {
         y: this.clipFrameBox.y,
       } = this.moveClipFrameFn(pointX, pointY));
       this.clipFrameEle.render(this.clipFrameBox);
-    } else if (this.flag & DrawFlag) {
-      this.currGraphInfo.endX = pointX;
-      this.currGraphInfo.endY = pointY;
+    } else if (this.flag & DrawFlag || this.flag & ResizeGraphFlag) {
+      const graphBox = this.resizeGraphFn(pointX, pointY);
+      this.currGraphInfo.startX = graphBox.x;
+      this.currGraphInfo.startY = graphBox.y;
+      this.currGraphInfo.endX = graphBox.x + graphBox.width;
+      this.currGraphInfo.endY = graphBox.y + graphBox.height;
+      this.currGraphInfo.width = graphBox.width;
+      this.currGraphInfo.height = graphBox.height;
+      this.canvasRender.draw(this.realtimeCtx, [this.currGraphInfo]);
+    } else if (this.flag & MoveGraphFlag) {
+      const graphBox = this.moveGraphFn(pointX, pointY);
+      this.currGraphInfo.startX = graphBox.x;
+      this.currGraphInfo.startY = graphBox.y;
+      this.currGraphInfo.endX = graphBox.x + this.currGraphInfo.width;
+      this.currGraphInfo.endY = graphBox.y + this.currGraphInfo.height;
       this.canvasRender.draw(this.realtimeCtx, [this.currGraphInfo]);
     }
   }
@@ -209,15 +223,27 @@ export default class Paint extends UIElement {
       const toolBarRenderData = this.posToolBarFn(this.clipFrameBox.x, this.clipFrameBox.y, this.clipFrameBox.width, this.clipFrameBox.height);
       this.toolBarEle.render(toolBarRenderData);
     } else if (this.flag & DrawFlag) {
-      const diffX = Math.abs(this.currGraphInfo.startX - this.currGraphInfo.endX);
-      const diffY = Math.abs(this.currGraphInfo.startY - this.currGraphInfo.endY);
-      if (diffX > 4 || diffY > 4) {
+      this.graphInfoList.forEach(item => item.select = false);
+      if (this.currGraphInfo.width > 4 || this.currGraphInfo.height > 4) {
         this.graphInfoList.push(this.currGraphInfo);
-        this.saveGraphInfo();
       }
+      this.saveGraphInfo();
 
       this.flag &= ~DrawFlag;
       this.flag |= DrawReadyFlag;
+      this.clipFrameEle.setInputData({ hoverFlag: true });
+    } else if (this.flag & ResizeGraphFlag || this.flag & MoveGraphFlag) {
+      if (this.currGraphInfo.width > 4 || this.currGraphInfo.height > 4) {
+        this.graphInfoList.push(this.currGraphInfo);
+      }
+      this.saveGraphInfo();
+
+      this.flag &= ~ResizeGraphFlag;
+      this.flag &= ~MoveGraphFlag;
+      this.flag &= ~SelectGraphFlag;
+      this.resizeGraphFn = null;
+      this.moveGraphFn = null;
+      this.clipFrameEle.setInputData({ hoverFlag: true });
     }
   }
 
@@ -233,28 +259,55 @@ export default class Paint extends UIElement {
     if (e.detail) {
       this.clipFrameEle.style.cursor = 'auto';
       this.flag |= DrawReadyFlag;
-      this.clipFrameEle.setInputData({ drawEnableFlag: true });
+      this.clipFrameEle.setInputData({ moveEnableFlag: false });
     } else {
       this.clipFrameEle.style.cursor = 'move';
       this.flag &= ~DrawReadyFlag;
-      this.clipFrameEle.setInputData({ drawEnableFlag: false });
+      this.clipFrameEle.setInputData({ moveEnableFlag: true });
     }
     this.currToolBarState = e.detail;
   }
 
   clipFrameSelectListener = (e) => {
-    const [selectGraphInfo] = this.graphInfoList.splice(e.detail, 1);
+    const [selectGraphInfo] = this.graphInfoList.splice(e.detail.graphIndex, 1);
     if (this.flag & SelectGraphFlag) {
       this.graphInfoList.push(this.currGraphInfo);
     }
     this.graphInfoList.push(selectGraphInfo);
+    this.graphInfoList.forEach(item => item.select = false);
+    selectGraphInfo.select = true;
 
     this.saveGraphInfo();
+    this.graphInfoList.pop();
+    this.drawPersistence();
     this.canvasRender.draw(this.realtimeCtx, [selectGraphInfo]);
 
     this.currGraphInfo = selectGraphInfo;
     this.toolBarEle.refreshView({ ...selectGraphInfo });
+    this.clipFrameEle.setInputData({ hoverFlag: false });
     this.flag |= SelectGraphFlag;
+
+    if (Number.isInteger(e.detail.anchorIndex) && e.detail.anchorIndex > -1) {
+      this.flag |= ResizeGraphFlag;
+      this.resizeGraphFn = resizeHighOrder({
+        index: +e.detail.anchorIndex,
+        rectX: selectGraphInfo.startX,
+        rectY: selectGraphInfo.startY,
+        rectWidth: selectGraphInfo.width,
+        rectHeight: selectGraphInfo.height
+      });
+    } else {
+      this.flag |= MoveGraphFlag;
+      this.moveGraphFn = moveHighOrder({
+        offsetX: e.detail.x - selectGraphInfo.startX,
+        offsetY: e.detail.y - selectGraphInfo.startY,
+        rectWidth: selectGraphInfo.width,
+        rectHeight: selectGraphInfo.height,
+        hostWidth: this.hostWidth,
+        hostHeight: this.hostHeight
+      });
+    }
+
   }
 
   clipFrameResizeListener = (e) => {
@@ -285,11 +338,19 @@ export default class Paint extends UIElement {
   clipFrameDrawListener = (e) => {
     this.flag &= ~DrawReadyFlag;
     this.flag |= DrawFlag;
+    this.clipFrameEle.setInputData({ hoverFlag: false });
     this.currGraphInfo = {
       startX: e.detail.x,
       startY: e.detail.y,
       ...this.currToolBarState
     }
+    this.resizeGraphFn = resizeHighOrder({
+      index: 4,
+      rectX: e.detail.x,
+      rectY: e.detail.y,
+      rectWidth: 0,
+      rectHeight: 0
+    });
   }
 
   toolBarUndoListener = (e) => {
@@ -301,7 +362,7 @@ export default class Paint extends UIElement {
 
       if (this.graphInfoHistoryCursor === 0) {
         this.flag = 0;
-        this.clipFrameEle.setInputData({ drawEnableFlag: false });
+        this.clipFrameEle.setInputData({ moveEnableFlag: true });
         this.clipFrameEle.style.cursor = 'move';
       }
     }
@@ -334,7 +395,7 @@ export default class Paint extends UIElement {
     this.toolBarEle.render({ x: 10000, y: 10000 });
     this.toolBarEle.refreshView(null);
     this.clipFrameEle.render({ x: 10000, y: 10000, width: 0, height: 0 });
-    this.clipFrameEle.setInputData({ drawEnableFlag: false, imageData: null, graphInfoList: [] });
+    this.clipFrameEle.setInputData({ moveEnableFlag: true, imageData: null, graphInfoList: [] });
     this.clipFrameEle.style.cursor = 'auto';
     this.flag = NOClipFrameFlag;
   }
