@@ -1,0 +1,62 @@
+.editer-property,
+.editer-value {
+  padding: 2px 5px;
+  margin: 0 5px;
+  outline-width: 0;
+  color: red;
+  background-color: rgba(50, 0, 0, 0.1);
+  border-radius: 4px;
+  border: solid 1px transparent;
+}
+
+.editer-expr {
+  outline-width: 0;
+  margin: 0 5px;
+  border: solid 1px transparent;
+}
+
+.editer-tool-bar {
+  margin: 5px 0;
+}
+
+.editer-tool-add-expr,
+.editer-tool-del-expr {
+  text-align: center;
+  cursor: pointer;
+  margin: 0 5px;
+  width: 25px;
+  user-select: none;
+  border-radius: 2px;
+  border: solid 1px #bbb;
+  vertical-align: top;
+}
+
+.editer-text-block:before {
+  font-weight: 900;
+  margin: 0 5px;
+}
+
+.editer-text-block:after {
+  font-weight: 900;
+  margin: 0 5px;
+}
+
+@keyframes blink {
+  0% {
+    border-color: rgba(255, 0, 0, 0);
+  }
+
+  50% {
+    border-color: rgba(255, 0, 0, 1);
+  }
+
+  100% {
+    border-color: rgba(255, 0, 0, 0);
+  }
+}
+
+.editer-expr.dirty {
+  animation: blink 500ms;
+  animation-delay: 300ms;
+  animation-iteration-count: 2;
+}
