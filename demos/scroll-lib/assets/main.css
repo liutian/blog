@@ -1,0 +1,13 @@
+.container{
+    border: solid red 1px;
+    background-color: #999;
+    width: 400px;
+    height: 300px;
+    position: relative;
+    user-select: none;
+}
+
+.gdt-bar_y{
+    border-radius: 10px;
+    cursor: pointer;
+}

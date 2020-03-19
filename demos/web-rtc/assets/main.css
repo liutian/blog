@@ -1,0 +1,29 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+video {
+  background-color: #000;
+}
+
+#self-video {
+  display: inline-block;
+  width: 45%;
+}
+
+#controls {
+  display: inline-block;
+  width: 50%;
+  vertical-align: top;
+}
+
+#other-video {
+  width: 100%;
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./assets/main.css">
+</head>
+
+<body>
+
+  <div>
+    <video id="self-video" autoplay playsinline></video>
+    <div id="controls">
+      <div>
+        昵称：
+        <input type="text" id="self-nickname">
+        <button id="start-btn">开始</button>
+      </div>
+      <div>
+        对方：
+        <input type="text" id="other-nickname">
+        <button id="invite-btn" disabled>邀请</button>
+      </div>
+    </div>
+  </div>
+
+  <video id="other-video" autoplay playsinline></video>
+
+  <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+  <script>
+    eruda.init();
+  </script>
+  <script src="https://10.11.112.14:4430/push/socket.io/socket.io.js"></script>
+  <script src="./assets/main.js"></script>
+</body>
+
+</html>

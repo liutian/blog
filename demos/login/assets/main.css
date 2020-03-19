@@ -1,0 +1,477 @@
+/* 重置浏览器样式 */
+
+*,*::after,*::before{
+    box-sizing: border-box; /* 设置元素盒模型 */
+}
+
+body{
+    /* 取消浏览器默认的外边距 */
+    margin: 0;
+    /* 设置默认字体大小，颜色，和字体库 */
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+    font-family: "Helvetica Neue",Helvetica,Tahoma,Arial,"PingFang SC","Hiragino Sans GB","Heiti SC","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+}
+
+/* 撑起页面整个高度，方便设置子元素高度100% */
+html,body{
+    height: 100%;
+}
+
+/* 设置链接默认样式 */
+a{
+    text-decoration: none;
+    color: inherit;
+}
+
+/* 重置部分浏览器对输入框的特殊样式 */
+input,button{
+    outline-width: 0;
+}
+
+/* 重置ul样式 */
+ul{
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+/* 重置全局样式 */
+
+
+/* 全局类样式 */
+
+/* 通用清除浮动类样式 */
+.clearfix::after,.clearfix::before{
+    display: table;
+    content: '';
+}
+
+.clearfix::after{
+    clear: both;
+}
+
+.pull-left{
+    float: left;
+}
+
+.pull-right{
+    float: right;
+}
+/* 重置浏览器样式 */
+
+/* 主体元素布局样式 */
+main{
+    display: table; /* 水平垂直居中布局 table方案 */
+    height: 100%;
+    width: 100%;
+    background-image: url(./img/bg.jpg);
+    background-size: cover; /* 背景图自适应布局居中布局 */ 
+}
+
+.main-wrapper{
+    display: table-cell;/* 水平垂直居中布局 table方案 */
+    vertical-align: middle;/* 水平垂直居中布局 table方案 */
+    text-align: center;/* 水平垂直居中布局 table方案 */
+}
+
+.input-login-panel,.scan-login-panel{
+    position: relative;
+    display: none;
+    width: 500px;
+    padding: 50px;
+    padding-bottom: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.input-login-panel.active,.scan-login-panel.active{
+    display: inline-block;
+}
+
+footer{
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+}
+/* 主体元素布局样式 */
+
+/* 正常登陆面板 */
+
+/* 面板切换触发器 */
+.scan-switch-triger,.input-switch-triger{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+}
+
+.logo{
+    display: block;
+    width: 195px;
+    height: 60px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+/* 错误提示 */
+.error-alert{
+    height: 32px;
+    line-height: 32px;
+}
+
+.error-alert > *{
+    display: none;
+    background-color: #eee;
+}
+
+.error-alert > .active{
+    display: block;
+}
+
+/* 叹号提示图标 */
+.error-alert  i{
+    position: relative;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    content: '';
+    border-radius: 50%;
+    background-color: #fdc287;
+    font-style: normal;
+    vertical-align: -1px;
+}
+.error-alert i::after{
+    position: absolute;/* 垂直水平居中 absolute方案 */
+    top:50%;/* 垂直水平居中 absolute方案 */
+    left: 50%;/* 垂直水平居中 absolute方案 */
+    transform: translate(-50%,-50%); /* 垂直水平居中 absolute方案 */
+    content: '!';
+    color: #fff;
+}
+
+/* 切换账号系统 */
+.switch-access-type{
+    height: 50px;
+    line-height: 50px;
+}
+
+.switch-access-type .item{
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* 单选按钮图标样式 */
+.switch-access-type .item i{
+    display: inline-block;
+    position: relative;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.3ex;
+}
+.switch-access-type .item i::before{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: solid 1px #D9D9D9 ;
+    border-radius: 50%;
+    content: '';
+}
+.switch-access-type .item i::after{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    height: 50%;
+    content: '';
+    background-color: transparent;
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+}
+/* 单选按钮图标样式 */
+
+.switch-access-type .item.active{
+    color: #004A7D;
+}
+
+.switch-access-type .item.active i::before{
+    border-color: #004A7D;
+}
+
+.switch-access-type .item.active i::after{
+    background-color: #004A7D;
+}
+
+/* 输入框父级容器 */
+.input-control{
+    position: relative;
+    height: 40px;
+    line-height: 40px;
+    margin-bottom: 30px;
+}
+
+/* 输入框元素 */
+.input-control input{
+    width: 100%;
+    height: 100%;
+    padding-left: 50px;
+    padding-right: 30px;
+    border: solid 1px #eee;
+    border-radius: 4px;
+    vertical-align: top;
+}
+
+.input-control input:focus{
+    border-color: #004A7D ;
+}
+
+.input-control .icon{
+    position: absolute;
+    width: 28px;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* 清除文本图标样式 */
+.input-control .clear-text{
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 14px;
+    height: 14px;
+    transform: translateY(-50%);
+    background-color: #999;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+}
+
+.input-control .clear-text::after,.input-control .clear-text::before{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60%;
+    height: 1px;
+    transform: translate(-50%,-50%) rotate(45deg);
+    background-color: #fff;
+    content: '';
+}
+
+.input-control .clear-text::before{
+    transform: translate(-50%,-50%) rotate(-45deg);
+}
+/* 清除文本图标样式 */
+
+.input-control .invalid-alert{
+    position: absolute;
+    line-height: 1.5;
+}
+
+.input-control .invalid-alert > *{
+    display: none;
+    color: red;
+}
+
+.input-control .invalid-alert > .active{
+    display: block;
+}
+
+.input-control.check-code input{
+    padding-right: 80px;
+}
+
+/* 验证码 */
+.input-control .code{
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 65px;
+    height: 25px;
+    transform: translateY(-50%);
+}
+
+.input-control .code img{
+    width: 100%;
+    height: 100%;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+.input-control .code .code-des{
+    display: none;
+    position: absolute;
+    top: -65px;
+    left: 50%;
+    width: 12em;
+    background-color: #fff;
+    transform: translateX(-50%);
+    line-height: 56px;
+    border-radius: 4px;
+    box-shadow:  0 0 8px 0 rgba(0,0,0,0.21); /* 四周阴影 */
+}
+
+.input-control .code .code-des::after{
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    border: solid 5px #fff;
+    border-top: solid #fff 5px;
+    border-right: solid #fff 5px;
+    content: '';
+    transform: translateX(-50%) rotate(135deg);
+    box-shadow: 3px -3px 4px 0 rgba(0,0,0,0.1);
+}
+
+.input-control .code:hover .code-des{
+    display: block;
+}
+/* 验证码 */
+
+form button{
+    display: inline-block;
+    width: 100%;
+    height: 44px;
+    margin-bottom: 30px;
+    font-size: 16px;
+    color: #fff;
+    border-radius: 2px;
+    border-width: 0;
+    cursor: pointer;
+    background-color: #004a7d;
+}
+
+/* 面板其他操作 */
+.action-bar{
+    position: relative;
+    color: #004A7D;
+    line-height: 1;
+    user-select: none;
+}
+
+ /* 切换语言，下拉菜单 */
+.switch-lang{
+    cursor: pointer;
+}
+
+.curr-lang{
+    position: relative;
+}
+
+/* 三角形样式 */
+.curr-lang::after{
+    position: absolute;
+    right: -1em;
+    top: calc(0.5em - 1px);
+    border: solid 5px transparent;
+    border-top: solid 5px #004A7D;
+    content: '';
+}
+
+.switch-lang  ul{
+    display: none;
+    position: absolute;
+    margin: 0 -5px;
+    padding: 5px 0;
+    background-color: #fff;
+}
+
+.switch-lang.active .lang-list{
+    display: block;
+}
+
+.switch-lang  .lang-list > *{
+    height: 32px;
+    line-height: 32px;
+    padding: 0 15px;
+    cursor: pointer;
+    background-color: #f7f7f7;
+}
+
+.switch-lang  .lang-list :hover{
+    background-color: #fff;
+    color: #0075F7;
+}
+
+.forget-passwd:hover {
+    text-decoration: underline;
+}
+
+/* 扫描二维码登陆 */
+.scan-login-panel .title{
+    font-size: 24px;
+    font-weight: 900;
+    text-align: center;
+}
+
+.scan-login-panel .qrcode{
+    display: inline-block;
+    border: solid 1px #eee;
+    margin: 50px 0;
+}
+
+.modal{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: -1;
+}
+
+.modal.active{
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+}
+
+.modal-msg{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background-color: rgba(0,0,0,0.6);
+    color: #fff;
+    text-align: center;
+    padding: 30px;
+    max-width: calc(20em + 60px);
+    border-radius: 5px;
+    margin-top: -100px;
+}
+
+/* 响应式移动端布局 */
+@media screen and (max-width: 768px){
+    main{
+        background-image: url(./img/bg2.png);
+    }
+
+    .main-wrapper{
+        vertical-align: top;
+    }
+
+    .input-login-panel,.scan-login-panel{
+        width: calc(100vw - 60px);
+        padding: 30px;
+        margin: 30px;
+    }
+
+    .input-switch-triger{
+        display: none;
+    }
+
+    footer{
+        bottom: 2vh;
+    }
+}
+
+

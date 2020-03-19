@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <!-- 禁止移动端视口缩放 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>系统登陆页</title>
+
+  <link rel="stylesheet" href="./assets/main.css">
+</head>
+
+<body>
+  <!-- 用main标签将页面主要视觉内容包裹起来 -->
+  <main>
+    <!-- 使用table方案来实现垂直水平居中，必须使用一个嵌套层 -->
+    <div class="main-wrapper">
+
+      <!-- 正常登陆面板 -->
+      <form class="input-login-panel active">
+        <!-- 面板切换的触发点 -->
+        <img class="input-switch-triger" src="./assets/img/ewm.png" />
+
+        <!-- 系统logo -->
+        <img src="./assets/img/logo.png" alt="" class="logo">
+
+        <!-- 展示错误提示信息 -->
+        <div class="error-alert">
+          <div class="not-match ">
+            <i></i>
+            <span i18n i18n-text-fan="用戶名或者密碼不正確">用户名或者密码不正确</span>
+          </div>
+        </div>
+
+        <!-- 切换账号系统 -->
+        <div class="switch-access-type">
+          <div class="item active">
+            <!-- 单选按钮图标 -->
+            <i></i>
+            <span i18n i18n-text-fan="域賬號">域账号</span>
+          </div>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <div class="item">
+            <!-- 单选按钮图标 -->
+            <i></i>
+            <span i18n i18n-text-fan="OA賬號">OA账号</span>
+          </div>
+        </div>
+
+        <!-- 用户名输入框 -->
+        <div class="input-control user-name">
+          <img src="./assets/img/user-name.png" alt="" class="icon">
+
+          <input type="text" placeholder="请输入用户名" i18n i18n-placeholder-fan="請輸入用戶名">
+
+          <!-- 清除文本的图标 -->
+          <i class="clear-text"></i>
+          <!-- 校验无效的提示信息 -->
+          <div class="invalid-alert">
+            <div class="empty" i18n i18n-text-fan="用戶名不能爲空">
+              用户名不能为空
+            </div>
+          </div>
+        </div>
+
+        <!-- 密码输入框 -->
+        <div class="input-control passwd">
+          <img src="./assets/img/passwd.png" alt="" class="icon">
+
+          <input type="password" placeholder="请输入密码" i18n i18n-placeholder-fan="請輸入密碼">
+
+          <!-- 清除文本的图标 -->
+          <i class="clear-text"></i>
+          <!-- 校验无效的提示信息 -->
+          <div class="invalid-alert">
+            <div class="empty " i18n i18n-text-fan="密碼不能爲空">
+              密码不能为空
+            </div>
+          </div>
+        </div>
+
+        <!-- 验证码输入框 -->
+        <div class="input-control check-code" style="display: none;">
+          <img src="./assets/img/valid-code.png" alt="" class="icon">
+
+          <input type="text">
+
+          <!-- 验证码图片 -->
+          <div class="code">
+            <img src="https://account.baozun.com/person/servlet/securityImage?d=0.877303206865474" alt="">
+            <div class="code-des" i18n i18n-text-fan="看不清楚！點擊換一張">
+              看不清楚！点击换一张
+            </div>
+          </div>
+          <!-- 校验无效的提示信息 -->
+          <div class="invalid-alert">
+            <div class="empty" i18n i18n-text-fan="驗證碼不能爲空">
+              验证码不能为空
+            </div>
+            <div class="error" i18n i18n-text-fan="驗證碼不正確">
+              验证码不正确
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" i18n i18n-text-fan="登錄">登录</button>
+
+        <!-- 面板其他操作 -->
+        <div class="action-bar clearfix">
+          <!-- 切换语言 -->
+          <div class="switch-lang  pull-left">
+            <div class="curr-lang">
+              简体中文
+            </div>
+            <ul class="lang-list">
+              <li lang-type="local">简体中文</li>
+              <li lang-type="fan">繁体中文</li>
+            </ul>
+          </div>
+
+          <a href="" class="forget-passwd pull-right" i18n i18n-text-fan="忘記密碼">忘记密码</a>
+        </div>
+      </form>
+
+      <!-- 扫描二维码登陆 -->
+      <div class="scan-login-panel ">
+        <!-- 面板切换的触发点 -->
+        <img class="scan-switch-triger" src="./assets/img/pc.png" />
+
+        <div class="title" i18n i18n-text-fan="手機掃碼，快捷登錄">
+          手机扫码，快捷登录
+        </div>
+
+        <!-- 展示二维码 -->
+        <div class="qrcode">
+          <img src="https://open.work.weixin.qq.com/wwopen/sso/qrImg?key=153ac7951cb3c0e8" alt="">
+        </div>
+
+        <div class="bottom-des">
+          <span i18n i18n-text-fan="打開">打开</span>
+          <strong i18n i18n-text-fan="手機企業微信">手机企业微信</strong>
+          <span i18n i18n-text-fan="掃一掃登錄">扫一扫登录</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer i18n i18n-text-fan="建議使用Chrome浏覽器訪問該系統">
+    建议使用Chrome浏览器访问该系统
+  </footer>
+
+  <div class="modal">
+    <div class="modal-msg" i18n i18n-text-fan="用戶名或者密碼不正確">
+      用户名或者密码不正确
+    </div>
+  </div>
+
+  <script src="./assets/main.js"></script>
+</body>
+
+</html>
