@@ -17,13 +17,21 @@ export default class CanvasRender {
       const posX = graphInfo.startX + diff;
       const posY = graphInfo.startY + diff;
 
+      ctx.beginPath();
       if (graphInfo.type === 'rect') {
 
-        ctx.strokeStyle = color
+        ctx.strokeStyle = color;
         ctx.lineWidth = size;
         ctx.lineJoin = 'round';
 
         ctx.strokeRect(posX, posY, width, height);
+      } else if (graphInfo.type === 'circular') {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = size;
+        ctx.lineJoin = 'round';
+
+        ctx.ellipse(posX + width / 2, posY + height / 2, width / 2, height / 2, 0, 0, Math.PI * 2);
+        ctx.stroke();
       }
       ctx.restore();
 
