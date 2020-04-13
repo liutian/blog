@@ -233,3 +233,6 @@
 - sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo  安装docker的yum源
 - sudo yum install docker-ce docker-ce-cli containerd.io  安装docker
 - sudo systemctl enable docker && sudo systemctl start docker  启动docker
+
+### 性能检查工具
+![](../assets/img/linux-3.jpg)
