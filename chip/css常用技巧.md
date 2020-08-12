@@ -1,12 +1,8 @@
 ### 清除浮动
 ```css
-.clearfix::before,
 .clearfix::after {
   content: '';
   display: table;
-}
-
-.clearfix::after {
   clear: both;
 }
 ```
@@ -84,7 +80,9 @@ x为设计稿中 字体/屏幕宽 比值
 
 ### 1像素边框
 ```css
-.container: relative;
+.container{
+  position: relative;
+}
 
 .container::after{
   position: absolute;
@@ -96,6 +94,29 @@ x为设计稿中 字体/屏幕宽 比值
   border: 1px solid #f66;
   transform: scale(.5);
   transform-origin: left top;
+}
+```
+
+### 1像素边
+```css
+.side{
+  background-color: #000;
+  height: 1px;
+  transform: scaleY(0.5);
+  transform-origin: 50% 100%;
+}
+```
+
+### 支持小于12px文字
+```css
+// 适用于移动端
+.container{
+  font-size: 10px;
+  -webkit-text-size-adjust: none;
+}
+// 适用于pc端
+.container{
+  transform: scale(0.8);
 }
 ```
 
