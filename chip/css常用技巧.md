@@ -77,6 +77,14 @@ x为设计稿中 字体/屏幕宽 比值
 ```
 `text-align-last` 也可用于两端布局
 
+### 清除img元素之间水平空白
+- 设置元素float
+- 元素收尾相连
+- 设置元素 `font-size: 0`
+- 设置父元素 `letter-spacing: -1em` 当前元素 `letter-spacing: normal`
+
+### 清除img元素垂直空白
+`vertical-align: bottom`
 
 ### 1像素边框
 ```css
@@ -117,31 +125,6 @@ x为设计稿中 字体/屏幕宽 比值
 // 适用于pc端
 .container{
   transform: scale(0.8);
-}
-```
-
-### 图片层阴影
-```css
-.avatar {
-  position: relative;
-  border-radius: 100%;
-  width: 200px;
-  height: 200px;
-  background: url(https://yangzw.vip/static/codepen/thor.jpg) no-repeat center/cover;
-}
-
-.avatar::after {
-  position: absolute;
-  left: 0;
-  top: 10%;
-  z-index: -1;
-  border-radius: 100%;
-  width: 100%;
-  height: 100%;
-  background: inherit;
-  filter: blur(10px) brightness(80%) opacity(.8);
-  content: "";
-  transform: scale(.95);
 }
 ```
 
@@ -189,8 +172,6 @@ x为设计稿中 字体/屏幕宽 比值
 }
 ```
 
-
-
 ### 美化选项框
 ```html
 <input type="radio" id="radio1" name="radio" hidden>
@@ -237,30 +218,6 @@ input:checked + label .radio-btn::after{
   border-radius: 50%;
   transform: scale(.5);
   transform-origin: center center;
-}
-```
-
-### 响应输入框获取焦点
-```html
-<div id="container">
-  <input type="text" name="user-name">
-  <input type="password" name="user-pwd">
-  <div class="user-name-focus">你在输入用户名</div>
-  <div class="user-pwd-focus">你在输入密码</div>
-</div>
-```
-
-```css
-.user-name-focus,.user-pwd-focus{
-  display: none;
-}
-
-input[name=user-name]:focus-within ~ .user-name-focus{
-  display: block;
-}
-
-input[name=user-pwd]:focus-within ~ .user-pwd-focus{
-  display: block;
 }
 ```
 
