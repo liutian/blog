@@ -98,21 +98,21 @@
     - 用Map表代替大量的 if-else 和 switch 会提升性能
     - 在JS中倒序循环会略微提升性能
     - 避免使用for...in（会枚举到原型，所以很慢）
-  - cpu密集的任务使用 WebAssembly 执行
+  - cpu密集的任务使用 `WebAssembly` 执行
+  - 使用 `requestAnimationFrame` 替换 `setTimeout` 保证回调函数稳定的在每一帧最开始触发
+  - 一个大任务拆分成多个小任务分布在不同的 `Macrotask` 中执行
+  - 将密集计算的任务移入 `WebWorker` 执行
 - CSS
-  - 对页面中可能发生大量重排重绘的元素单独触发渲染层（硬件加速）
+  - 对页面中可能发生大量重排重绘的元素抽离到独立渲染层（硬件加速）
   - 恰当使用will-change提升动画性能，以减少重绘
   - 使用Flex时，比使用inline-block和float时重排更快，所以在布局时可以优先考虑Flex
+  - 使用 css `contain` `content-visibility` `contain-intrinsic-size` 优化布局和绘制并减少不必要计算
 
 
 ### 性能优化之用户体验
 - 恰当添加 `Loading` 或者过渡动画提示用户
 - 骨架屏
 - 先加载低质量或模糊图片资源，后续加载完整版资源
-- 使用 css `contain` `content-visibility` `contain-intrinsic-size` 优化布局和绘制并减少不必要工作
-- 一个大任务拆分成多个小任务分布在不同的 `Macrotask` 中执行
-- 将密集计算的任务移入 `WebWorker` 执行
-- 使用 `requestAnimationFrame` 替换 `setTimeout` 保证回调函数稳定的在每一帧最开始触发
 
 ### 服务器端渲染
 弥补主要内容在前端渲染的成本，减少白屏时间，提升首次有效绘制的速度。可以使用服务端渲染来获得更快的首次有效绘制
