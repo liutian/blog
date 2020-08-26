@@ -179,6 +179,28 @@ p // ["Hello", {y: "World"}]
 ```
 
 ### 扩展运算符
+- 任何定义了遍历器（Iterator）接口的对象，都可以用扩展运算符转为真正的数组
+```
+let nodeList = document.querySelectorAll('div');
+let array = [...nodeList];
+
+let set = new Set();
+set.add('a');
+set.add('b');
+set.add('c');
+let array = [...set];
+
+// 对于那些没有部署 Iterator 接口的类似数组的对象，扩展运算符就无法将其转为真正的数组
+let arrayLike = {
+  '0': 'a',
+  '1': 'b',
+  '2': 'c',
+  length: 3
+};
+
+// TypeError: Cannot spread non-iterable object.
+let arr = [...arrayLike];
+```
 - 复制并创建新数组
 ```
 const a1 = [1, 2];
@@ -209,28 +231,7 @@ arr1.concat(arr2, arr3);
 'x\uD83D\uDE80y'.length // 4
 [...'x\uD83D\uDE80y'].length // 3
 ```
-- 任何定义了遍历器（Iterator）接口的对象，都可以用扩展运算符转为真正的数组
-```
-let nodeList = document.querySelectorAll('div');
-let array = [...nodeList];
 
-let set = new Set();
-set.add('a');
-set.add('b');
-set.add('c');
-let array = [...set];
-
-// 对于那些没有部署 Iterator 接口的类似数组的对象，扩展运算符就无法将其转为真正的数组
-let arrayLike = {
-  '0': 'a',
-  '1': 'b',
-  '2': 'c',
-  length: 3
-};
-
-// TypeError: Cannot spread non-iterable object.
-let arr = [...arrayLike];
-```
 
 
 ### 严格模式
