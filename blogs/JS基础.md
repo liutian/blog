@@ -110,7 +110,7 @@ b // 'y'
 z // 'z'
 
 let map = new Map();
-map.push('name','Zhang');
+map.set('name','Zhang');
 let [list] = map;
 list // ['name','Zhang'];
 
