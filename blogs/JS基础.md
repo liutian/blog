@@ -132,21 +132,7 @@ let {[10]: ten,[arr.length - 1]: last} = arr;
 ten // undefined
 last // 'd'
 ```
-- 嵌套赋值
-```
-let obj = {
-  p: [
-    'Hello',
-    { y: 'World' }
-  ]
-};
 
-let { p, p: [x, { y }] } = obj;
-x // "Hello"
-y // "World"
-p // ["Hello", {y: "World"}]
-// 第二个p只是模式的一部分，第一个p才是变量赋值
-```
 - 给现有对象或者数组赋值
 ```
 // 错误的写法
@@ -176,7 +162,21 @@ let {x: y2 = ++i} = {x: 5};
 y2 // 5
 i // 4
 ```
+- 嵌套赋值
+```
+let obj = {
+  p: [
+    'Hello',
+    { y: 'World' }
+  ]
+};
 
+let { p, p: [x, { y }] } = obj;
+x // "Hello"
+y // "World"
+p // ["Hello", {y: "World"}]
+// 第二个p只是模式的一部分，第一个p才是变量赋值
+```
 
 ### 扩展运算符
 - 复制并创建新数组
