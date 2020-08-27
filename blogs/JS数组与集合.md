@@ -10,12 +10,12 @@ arr // [1,2,3]
 ### Array.from
 `Array.from` 可以将 **伪数组** 和 **可遍历对象** 转为真正的数组
 > 伪数组：对象中包含 `length` 属性
-```
+```js
 // 伪数组
 let arrayLike = {
-    '0': 'a',
-    '1': 'b',
-    '2': 'c',
+    0: 'a',
+    1: 'b',
+    2: 'c',
     length: 3
 };
 let arr2 = Array.from(arrayLike); // ['a', 'b', 'c']

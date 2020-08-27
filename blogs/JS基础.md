@@ -233,6 +233,35 @@ arr1.concat(arr2, arr3);
 ```
 
 
+### 链判断运算符
+判断左侧的对象是否为 `null` 或 `undefined` 如果是的，不再往下运算，直接返回 `undefined`  
+```
+const firstName = message?.body?.user?.firstName || 'default';
+const passwordValue = loginForm.querySelector('input[name=password]')?.value;
+person.sayHello?.();
+```
+> 链运算符禁止用于赋值运算符左侧 `a?.b = c`  
+
+
+#### 短路机制 
+```
+a?.[++x]
+// 等同于
+a == null ? undefined : a[++x]
+```
+如果 `a` 是 `undefined` 或 `null`，那么 `x` 不会进行递增运算
+
+
+### Null 判断运算符
+它的行为类似 `||`，但是只有运算符左侧的值为 `null` 或 `undefined` 时，才会返回右侧的值
+```
+// 之前的做法
+let result = response.result || 'default'; // 当 response.result 为 0 '' false 时 result 被错误的赋值为 'default'
+
+// 改进的做饭
+let result = response.result ?? 'default'; // 仅当 response.result 为 null 或者 undefined 时 result 才会赋值为 'default'
+```
+
 
 ### 严格模式
 - **无论是全局作用域还是函数作用域都不再意外创建全局变量(例如变量未声明就赋值)**

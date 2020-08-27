@@ -18,11 +18,7 @@ const human = {
   }
 }
 
-// 简写的对象方法不能用作构造函数
-new human.introduce();
-new human.speak();
 ```
-> **super** 只能出现在Class方法和对象简写方法中
 
 
 ### 对象扩展运算符
@@ -61,35 +57,6 @@ x // 1
 y // undefined
 z // 3
 ```
-
-
-### 链判断运算符
-判断左侧的对象是否为 `null` 或 `undefined` 如果是的，不再往下运算，直接返回 `undefined`  
-```
-const firstName = message?.body?.user?.firstName || 'default';
-const passwordValue = loginForm.querySelector('input[name=password]')?.value;
-person.sayHello?.();
-```
-> 链运算符禁止用于赋值运算符左侧 `a?.b = c`  
-**短路机制**  
-```
-a?.[++x]
-// 等同于
-a == null ? undefined : a[++x]
-```
-如果 `a` 是 `undefined` 或 `null`，那么 `x` 不会进行递增运算
-
-
-### Null 判断运算符
-它的行为类似 `||`，但是只有运算符左侧的值为 `null` 或 `undefined` 时，才会返回右侧的值
-```
-// 之前的做法
-let result = response.result || 'default'; // 当 response.result 为 0 '' false 时 result 被错误的赋值为 'default'
-
-// 改进的做饭
-let result = response.result ?? 'default'; // 仅当 response.result 为 null 或者 undefined 时 result 才会赋值为 'default'
-```
-
 
 ### 对象属性枚举与遍历
 以下四个操作会忽略描述符 `enumerable` 为 `false` 的属性
