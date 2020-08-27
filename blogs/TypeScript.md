@@ -1,4 +1,16 @@
 
+TypeScript 的类型是 JavaScript 类型的超集。但是从更深层次上来说，两者的本质是不一样的，一个是值的类型，一个是变量的类型
+
+类型推导是仅仅在初始化的时候进行推导
+
+```ts
+let a = "lucifer"; // 我们没有给 a 声明类型， a 被推导为string
+a.toFixed(); // Property 'toFixed' does not exist on type 'string'.
+a.includes("1"); // ok
+a = 1;
+a.toFixed(); // 依然报错， a 不会被推导 为 number
+```
+
 ### 特殊类型
 
 #### void
