@@ -16,12 +16,13 @@
 `:nth-of-type()` `:nth-child()` `:checked` `:focus` `:disabled` `:enabled` `read-only` `read-write` `:target` `:not()` `:host()` `:host-context()` 
 
 ### white-space
-|          | 源码空格 | 源码换行 | 内容超出容器边界换行 |
-| normal   | 合并     | 忽略     | 换行                |
-| nowrap   | 合并     | 忽略     | 不换行              |
-| pre      | 保留     | 换行     | 不换行              |
-| pre-wrap | 保留     | 换行     | 换行                |
-| pre-line | 合并     | 换行     | 换行                |
+| 属性值   | 源码空格 | 源码换行 | 内容超出容器边界换行 |
+| -------- | -------- | -------- | -------------------- |
+| normal   | 合并     | 忽略     | 换行                 |
+| nowrap   | 合并     | 忽略     | 不换行               |
+| pre      | 保留     | 换行     | 不换行               |
+| pre-wrap | 保留     | 换行     | 换行                 |
+| pre-line | 合并     | 换行     | 换行                 |
 
 
 ### 元素垂直方向的百分比设定是相对于父元素的高度吗?

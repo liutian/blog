@@ -6,18 +6,18 @@
 - 全局作用域
 - 函数作用域
 - 块级作用域
-> for 循环有两层作用域
+> for 循环和函数有两层作用域
 
 
 ### 块级作用域
-```
+```js
 // 块级作用域写法
 {
   let tmp = ...;
   ...
 }
 
-// IIFE 写法
+// 没有块级作用域之前的写法 IIFE
 (function () {
   var tmp = ...;
   ...
@@ -27,7 +27,7 @@
 
 ### let和var区别
 - `let` 声明的变量只在命令所在的代码块内有效
-```
+```js
 { // 代码块
   let a = 10;
   var b = 1;
@@ -44,8 +44,10 @@ for (let i = 0; i < 10; i++) {
   };
 }
 a[6](); // 6
-// 变量i是let声明的，当前的i只在本轮循环有效，所以每一次循环的i其实都是一个新的变量，所以最后输出的是6。你可能会问，如果每一轮循环的变量i都是重新声明的，那它怎么知道上一轮循环的值，从而计算出本轮循环的值？这是因为 JavaScript 引擎内部会记住上一轮循环的值，初始化本轮的变量i时，就在上一轮循环的基础上进行计算
-// 另外，for循环还有一个特别之处，就是设置循环变量的那部分是一个父作用域，而循环体内部是一个单独的子作用域
+// 变量i是let声明的，当前的i只在本轮循环有效，所以每一次循环的i其实都是一个新的变量，所以最后输出的是6
+
+
+// for循环还有一个特别之处，就是设置循环变量的那部分是一个父作用域，而循环体内部是一个单独的子作用域
 for (let i = 0; i < 3; i++) {
   let i = 'abc';
   console.log(i);
@@ -54,8 +56,8 @@ for (let i = 0; i < 3; i++) {
 // abc
 // abc
 ```
-- 不存在变量提升，如果区块中存在 `let` 和 `const` 命令，这个区块对这些命令声明的变量，从一开始就形成了封闭作用域。凡是在声明之前就使用这些变量，就会报错
-```
+- 不存在变量提升，即暂时性死区。如果区块中存在 `let` 和 `const` 命令，这个区块对这些命令声明的变量，从一开始就形成了封闭作用域。凡是在声明之前就使用这些变量，就会报错
+```js
 {
   console.log(a); // ReferenceError
   let a = 10;
@@ -76,8 +78,8 @@ let x;
 
 
 ### 解构赋值
-- 只有等号两边的 **模式** 相同，左边的变量才会被赋予对应的值，当等号右边的值不是对象或数组，将其转为对象在进行赋值
-```
+- 只有等号两边的 **模式** 相同，左边的变量才会被赋予对应的值
+```js
 let {name,...newObj} = {name: 'xxx', age: 20, address: 'yyy'};
 let [first,...newArr] = [10,'xx',{},true];
 let {length} = ['xxx']; // 因为数组也是对象
@@ -98,8 +100,9 @@ let [foo] = {}; // 报错
 let { prop: x } = undefined; // TypeError
 let { prop: y } = null; // TypeError
 ```
+
 - 只要数据结构具有 Iterator 接口，都可以采用数组形式的解构赋值
-```
+```js
 let [x, y, z] = new Set(['a', 'b', 'c']);
 x // "a"
 
@@ -111,8 +114,10 @@ z // 'z'
 
 let map = new Map();
 map.set('name','Zhang');
-let [list] = map;
-list // ['name','Zhang'];
+map.set('age',14');
+let [entry1, entry2] = map;
+entry1 // ['name','Zhang'];
+entry2 // ['age', 14]
 
 for (let [key, value] of map) {
   // ...
@@ -122,8 +127,9 @@ for (let [,value] of map) {
   // ...
 }
 ```
-- 变量名与属性名不一致
-```
+
+- 重命名变量名
+```js
 let { foo: baz } = { foo: 'aaa', bar: 'bbb' };
 baz // "aaa"
 
@@ -133,23 +139,8 @@ ten // undefined
 last // 'd'
 ```
 
-- 给现有对象或者数组赋值
-```
-// 错误的写法
-let x;
-{x} = {x: 1};
-// SyntaxError: syntax error
-
-// 正确的写法
-let x;
-({x} = {x: 1});
-
-let obj = {};
-({a: obj.a = 'aaa',b: obj.b = 'bbb'} = {a: 'test'});
-```
-> 如果要将一个已经声明的变量用于解构赋值，必须非常小心
 - 特殊解构赋值默认值
-```
+```js
 // 数组也是对象
 let {0:first = 'aa'} = ['xx','yy']; 
 
@@ -162,25 +153,25 @@ let {x: y2 = ++i} = {x: 5};
 y2 // 5
 i // 4
 ```
-- 嵌套赋值
-```
-let obj = {
-  p: [
-    'Hello',
-    { y: 'World' }
-  ]
-};
 
-let { p, p: [x, { y }] } = obj;
-x // "Hello"
-y // "World"
-p // ["Hello", {y: "World"}]
-// 第二个p只是模式的一部分，第一个p才是变量赋值
+- 给现有变量赋值
+```js
+// 错误的写法
+let x;
+{x} = {x: 1};
+// SyntaxError: syntax error
+
+// 正确的写法
+let x;
+({x} = {x: 1});
+
+let obj = {};
+({a: obj.a = 'aaa',b: obj.b = 'bbb'} = {a: 'test'});
 ```
 
-### 扩展运算符
-- 任何定义了遍历器（Iterator）接口的对象，都可以用扩展运算符转为真正的数组
-```
+### 数组扩展运算符
+任何定义了遍历器（Iterator）接口的对象，都可以用扩展运算符转为真正的数组
+```js
 let nodeList = document.querySelectorAll('div');
 let array = [...nodeList];
 
@@ -201,8 +192,10 @@ let arrayLike = {
 // TypeError: Cannot spread non-iterable object.
 let arr = [...arrayLike];
 ```
+
+### 数组扩展运算符用途
 - 复制并创建新数组
-```
+```js
 const a1 = [1, 2];
 // 写法一
 const a2 = [...a1];
@@ -210,7 +203,7 @@ const a2 = [...a1];
 const [...a2] = a1;
 ```
 - 合并数组
-```
+```js
 const arr1 = ['a', 'b'];
 const arr2 = ['c'];
 const arr3 = ['d', 'e'];
@@ -224,7 +217,7 @@ arr1.concat(arr2, arr3);
 // [ 'a', 'b', 'c', 'd', 'e' ]
 ```
 - 解决无法识别非 `BMP` 字符的问题
-```
+```js
 [...'hello']
 // [ "h", "e", "l", "l", "o" ]
 
@@ -240,7 +233,7 @@ const firstName = message?.body?.user?.firstName || 'default';
 const passwordValue = loginForm.querySelector('input[name=password]')?.value;
 person.sayHello?.();
 ```
-> 链运算符禁止用于赋值运算符左侧 `a?.b = c`  
+> 链运算符不能用于赋值运算符左侧 `a?.b = c`  
 
 
 #### 短路机制 
@@ -249,23 +242,23 @@ a?.[++x]
 // 等同于
 a == null ? undefined : a[++x]
 ```
-如果 `a` 是 `undefined` 或 `null`，那么 `x` 不会进行递增运算
+如果 `a` 是 `undefined` 或 `null`，那么 `x` 不会进行递增运算，即惰性计算
 
 
 ### Null 判断运算符
 它的行为类似 `||`，但是只有运算符左侧的值为 `null` 或 `undefined` 时，才会返回右侧的值
-```
+```js
 // 之前的做法
 let result = response.result || 'default'; // 当 response.result 为 0 '' false 时 result 被错误的赋值为 'default'
 
-// 改进的做饭
+// 改进的做法
 let result = response.result ?? 'default'; // 仅当 response.result 为 null 或者 undefined 时 result 才会赋值为 'default'
 ```
 
 
 ### 严格模式
 - **无论是全局作用域还是函数作用域都不再意外创建全局变量(例如变量未声明就赋值)**
-- **不能对只读属性赋值，不可写属性赋值，不可扩展对象的新属性赋值**
+- **不能对只读属性赋值，不能删除不可配置属性，不可扩展对象的新属性赋值**
 - **不能删除不可删除的属性**
 - 函数的参数不能有同名属性
 - 禁止传统八进制数字语法，统一改用 `0O` 为前缀的八进制写法
@@ -293,11 +286,10 @@ console.assert(fun.bind(true)() === true);
 ### 顶层对象
 在浏览器环境指的是 `window` 对象，在 `Node` 指的是 `global` 对象。`ES5` 之中，顶层对象的属性与全局变量是等价的  
 为了保持兼容性，`var` 命令和 `function` 命令声明的全局变量，依旧是顶层对象的属性；`let` 命令、`const` 命令、`class` 命令声明的全局变量，不属于顶层对象的属性
-```
+```js
 var a = 1;
-// 如果在 Node 的 REPL 环境，可以写成 global.a
-// 或者采用通用方法，写成 this.a
 window.a // 1
+// 如果在 Node 的 REPL 环境，可以写成 global.a
 
 let b = 1;
 window.b // undefined

@@ -1,7 +1,8 @@
 ### 函数参数默认值
 当参数值为 `undefined` 时会被赋予指定默认值
+
 - 参数默认值不是传值的，而是每次都重新计算默认值表达式的值
-```
+```js
 let x = 0;
 function hello(y = x + 1){
   console.log(y);
@@ -18,8 +19,9 @@ function hello({x, y = 5} = {}) {
 
 hello() // undefined 5
 ```
-- 参数的默认值会使参数形成一个单独的作用域（context）。等到初始化结束，这个作用域就会消失
-```
+
+- 参数的默认值会使参数形成一个单独的作用域（context）
+```js
 var x = 1;
 
 function f(x, y = x) {
@@ -51,8 +53,9 @@ function bar(func = () => foo) {
 
 bar(); // outer
 ```
+
 - 利用参数默认值，可以指定某一个参数不得省略，如果省略就抛出一个错误
-```
+```js
 function throwIfMissing() {
   throw new Error('Missing parameter');
 }
@@ -68,7 +71,7 @@ foo()
 
 ### rest参数
 用于获取函数的多余参数，这样就不需要使用 `arguments` 对象了。`rest` 是一个 **真正** 数组，而 `arguments` 是一个伪数组 
-```
+```js
 function sortNumbers() {
   return Array.prototype.slice.call(arguments).sort();
 }
@@ -82,8 +85,9 @@ const sortNumbers = (...numbers) => numbers.sort();
 ### 箭头函数
 箭头函数体内的 `this` 对象，就是定义时所在的对象，而不是使用时所在的对象  
 `this` 指向的固定化，并不是因为箭头函数内部有绑定 `this` 的机制，实际原因是箭头函数根本没有自己的 `this`，导致内部的 `this` 就是外层代码块的 `this`。正是因为它没有 `this`，所以也就不能用作构造函数，除了`this`，以下三个变量在箭头函数之中也是不存在的，指向外层函数的对应变量：`arguments` `super` `new.target` 另外，由于箭头函数没有自己的 `this`，所以当然也就不能用 `call` `apply` `bind` 这些方法去改变 `this` 的指向
+
 - 如果箭头函数不需要参数或需要多个参数，需要用圆括号代表参数部分
-```
+```js
 var f = () => 5;
 // 等同于
 var f = function () { return 5 };
@@ -100,8 +104,9 @@ var sum = (num1, num2) => {
   return num1 + num2; 
 }
 ```
+
 - 由于大括号被解释为代码块，所以如果箭头函数直接返回一个对象，必须在对象外面加上括号，否则会报错
-```
+```js
 // 报错
 let getTempItem = id => { id: id, name: "Temp" };
 
@@ -109,11 +114,12 @@ let getTempItem = id => { id: id, name: "Temp" };
 let getTempItem = id => ({ id: id, name: "Temp" });
 ```
 - 如果箭头函数只有一行语句，且不需要返回值，可以采用下面的写法，就不用写大括号了
-```
+```js
 let fn = () => void doesNotReturn();
 ```
+
 - 箭头函数不适用，定义对象的方法，且该方法内部包括 `this`
-```
+```js
 // `this` 指向全局对象，这是因为对象不构成单独的作用域，导致 `speak` 箭头函数定义时的作用域就是全局作用域
 const human = {
   word: 'hello',
@@ -126,7 +132,7 @@ const human = {
 
 ### 尾调用
 函数的 **最后一步** 是调用另一个函数
-```
+```js
 function f(x){
   return g(x);
 }
@@ -136,8 +142,10 @@ function f(x){
   return g(x) + 1;
 }
 ```
+
 尾调用不一定出现在函数尾部，只要是最后一步操作即可
-```
+
+```js
 function f(x) {
   if (x > 0) {
     return m(x)
@@ -150,7 +158,8 @@ function f(x) {
 ### 尾调用优化
 尾调用由于是函数的最后一步操作，其实不需要保留外层函数的调用帧，因为调用位置、内部变量等信息都不会再用到了
 只有不再用到外层函数的内部变量，内层函数的调用帧才会取代外层函数的调用帧，否则就无法进行 **尾调用优化**
-```
+
+```js
 function addOne(a){
   var one = 1;
   function inner(b){
@@ -174,7 +183,7 @@ function addOne(a){
 - `await` 命令后面是一个 `thenable` 对象（即定义then方法的对象），那么 `await` 会将其等同于 `Promise` 对象
 - `async` 函数可以保留运行堆栈
 - 使用 `try...catch` 结构，实现多次重复尝试
-```
+```js
 const superagent = require('superagent');
 const NUM_RETRIES = 3;
 
@@ -191,7 +200,7 @@ async function test() {
 test();
 ```
 - 多个 `await` 命令后面的异步操作，如果不存在继发关系，最好让它们同时触发
-```
+```js
 // 写法一
 let [foo, bar] = await Promise.all([getFoo(), getBar()]);
 

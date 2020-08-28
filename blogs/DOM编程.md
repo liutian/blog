@@ -9,7 +9,7 @@
 ### Node 继承 EventTarget
 - 属性
   - `parentNode: Node`
-  - `parentElement: Node`
+  - `parentElement: Node` 如果父节点不是一个元素(Element), 这个属性返回null
   - `nextSibling: Node`
   - `previousSibling: Node`
   - `childNodes: NodeList`
@@ -133,7 +133,7 @@
 一个没有父对象的最小文档对象。它被作为一个轻量版的 Document 使用，就像标准的document一样，存储由节点组成的文档结构。与document相比，最大的区别是DocumentFragment 不是真实 DOM 树的一部分，它的变化不会触发 DOM 树的重新渲染，且不会导致性能等问题
 
 ### HTMLCollection
-表示通用元素集合，会即时更新，不能操作该集合，适用于 `document.images` `document.links` `document.scripts`
+表示通用元素集合，会即时更新，不能操作该集合，适用于 `document.images` `document.links` `document.scripts` `Element.prototype.children`
 
 ### NodeList
 表示特定节点集合，适用于 `Node.childNodes` 或者 `querySelectorAll`，它是一个类似数组的对象，但是可以使用 forEach() 来迭代。可以使用 Array.from() 将其转换为数组，一般情况它是一个实时集合，例如 `Node.childNodes`，其他情况它是一个静态集合，例如 `querySelectorAll`

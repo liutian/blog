@@ -1,9 +1,12 @@
 ### 常见事件
-- 键盘事件：`keydown` `keypress` `keyup`
-- 鼠标事件：`click` `contextmenu` `dblclick` `mousedown` `mousemove`  `mouseup` `pointerlockchange` `pointerlockerror` `select` `wheel` `contextmenu` `mouseenter` `mouseleave` 会冒泡 `mouseover` `mouseout` 不会冒泡
+- 键盘事件：`keydown`  `keyup` ~~`keypress`~~
+- 鼠标事件：`click` `dblclick` `mousedown` `mousemove`  `mouseup` `pointerlockchange` `pointerlockerror` `select` `wheel` `contextmenu` 
+
+`mouseenter` `mouseleave` 会冒泡 `mouseover` `mouseout` 不会冒泡
 - 表单事件：`reset` `submit` `change` `input` `beforeinput` 
 - 资源事件：`load` `error` `abort` `beforeunload` `unload`;常用于控制图片异步加载，脚本异步加载，监听页面文档载入状态
 - 视图事件：`fullscreenchange` `fullscreenerror` `resize` `scroll`
+
 `focusin` `focusout` 不会冒泡  `focus`  `blur` 会冒泡 
 
 - 剪贴板事件：`cut` `copy` `paste`

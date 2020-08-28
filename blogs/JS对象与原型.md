@@ -1,5 +1,5 @@
 ### 对象简写形式
-```
+```js
 const name = 'Zhang';
 const key = 'motto';
 const fn = 'speak';
@@ -23,21 +23,22 @@ const human = {
 
 ### 对象扩展运算符
 - 用于合并两个对象  
-```
+```js
 let ab = { ...a, ...b };
 
 // 等同于
 let ab = Object.assign({}, a, b);
 ```
 - 修改现有对象属性  
-```
+```js
 let newObj = {
-  ...oldObj,
+  ...oldObj, // ...oldObj和name顺序会影响最终生产的对象
   name: 'New Name' 
 };
 
 // 等同于
-let newObj = Object.assign(oldObj, {name: 'New Name});
+let newObj = Object.assign(oldObj, {name: 'New Name'});
+
 ```
 - 可以跟表达式
 ```
@@ -59,7 +60,6 @@ z // 3
 ```
 
 ### 对象属性枚举与遍历
-以下四个操作会忽略描述符 `enumerable` 为 `false` 的属性
 - `for...in` 遍历对象自身和继承的可枚举的属性（包括方法）
 - `Object.keys` 返回对象自身可枚举属性名称的数组（包括方法）
 - `JSON.stringify` 只串行化对象自身可枚举的属性和 `Object.keys` 类似但是不包括方法
@@ -83,7 +83,9 @@ z // 3
 - `Object.getPrototypeOf` 返回指定对象的原型 `Object.getPrototypeOf(Child) === Parent`
 - `Object.setPrototypeOf` 设置指定对象的原型
 - `Reflect.ownKeys` 除了包含 `Object.getOwnPropertyNames` 结果外还会包含对象自身 `Symbol` 属性
-
+- `Object.freeze` 不能向这个对象添加新的属性，不能删除已有属性，不能修改该对象已有属性的可枚举性、可配置性、可写性，以及不能修改已有属性的值。此外，冻结一个对象后该对象的原型也不能被修改
+- `Object.preventExtensions` 不能再添加新的属性
+- `Object.seal` 阻止添加新属性并将所有现有属性标记为不可配置。当前属性的值只要原来是可写的就可以改变
 
 ### 类定义
 ```
