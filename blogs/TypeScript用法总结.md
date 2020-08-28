@@ -639,21 +639,6 @@ let mySquare = createSquare(squareOptions);
 ```
 
 
-
-
-
-
-### 可选链
-```ts
-obj?.prop.fn()
-```
-
-### 空值联合
-```ts
-obj ?? '123'
-```
-
-
 ### 定义全局变量
 ```ts
 declare var var1: number;
