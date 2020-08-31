@@ -314,7 +314,8 @@ window.b // undefined
 
 **JSON.stringify实现深度拷贝的弊端**
 - 拷贝带有循环引用的对象时会报错
-- 无法拷贝函数  
+- 无法拷贝函数、正则  
+- 对象丢失原有constructor，并指向Object
 
 **高性能JSON.stringify实现思路**
 - 开发者事先定义 `JSON scheme`
