@@ -41,14 +41,14 @@ let newObj = Object.assign(oldObj, {name: 'New Name'});
 
 ```
 - 可以跟表达式
-```
+```js
 const obj = {
   ...(x > 1 ? {a: 1} : {}),
   b: 2,
 };
 ```
 - 不能复制继承自原型对象的属性
-```
+```js
 const o = Object.create({ x: 1, y: 2 });
 o.z = 3;
 
@@ -66,6 +66,49 @@ z // 3
 - `Object.assign` 只拷贝对象自身可枚举的属性和 `Object.keys` 一致
 > 类中定义的方法都是不可枚举的，尽量 `Object.keys` 替代 `for...in`
 
+### 实现对象深度拷贝
+```js
+function clone (parent) {
+  const parents = [];
+  const children = [];
+
+  function _clone (parent) {
+    if (parent === null) return null;
+    if (typeof parent !== 'object') return parent;
+
+    let child, proto;
+
+    if (isType(parent, 'Array')) {
+      child = [];
+    } else if (isType(parent, 'RegExp')) {
+      child = new RegExp(parent.source, getRegExp(parent));
+      if (parent.lastIndex) child.lastIndex = parent.lastIndex;
+    } else if (isType(parent, 'Date')) {
+      child = new Date(parent.getTime());
+    } else {
+      proto = Object.getPrototypeOf(parent);
+      child = Object.create(proto);
+    }
+
+    const index = parents.indexOf(parent);
+
+    if (index != -1) {
+      return children[index];
+    }
+
+    parents.push(parent);
+    children.push(child);
+
+    for (let i in parent) {
+      child[i] = _clone(parent[i]);
+    }
+
+    return child;
+  }
+
+  return _clone(parent);
+}
+```
 
 ### API备忘录
 - **`Object.assign`** 复制一个或多个对象来创建一个新的对象，源对象和目标对象可以是数组
@@ -88,7 +131,7 @@ z // 3
 - `Object.seal` 阻止添加新属性并将所有现有属性标记为不可配置。当前属性的值只要原来是可写的就可以改变
 
 ### 类定义
-```
+```js
 let ability = 'eat';
 
 class Human {
@@ -156,7 +199,7 @@ class Student extends Human {
 ### 子类 __proto__ 与 prototype
 - 子类的 `__proto__` 属性，表示构造函数的继承，总是指向父类
 - 子类 `prototype` 属性的 `__proto__` 属性，表示方法的继承，总是指向父类的prototype属性
-```
+```js
 class A {
 }
 
@@ -167,7 +210,7 @@ B.__proto__ === A // true
 B.prototype.__proto__ === A.prototype // true
 ```
 **继承的本质**  
-```
+```js
 class A {
 }
 
@@ -183,7 +226,7 @@ Object.setPrototypeOf(B, A);
 const b = new B();
 ```
 **继承的特殊场景**  
-```
+```js
 // 子类继承Object类
 class A extends Object {
 }
@@ -203,6 +246,22 @@ A.prototype.__proto__ === Object.prototype // true
 // 这种情况下，A作为一个基类（即不存在任何继承），就是一个普通函数，所以直接继承Function.prototype。但是，A调用后返回一个空对象（即Object实例），所以A.prototype.__proto__指向构造函数（Object）的prototype属性
 ```
 
+### 实现ES6的class
+```js
+functioni inherit(subType, superType){
+  subType.prototype = Object.create(superType.prototype,{
+    constructor: {
+      enumerable: false,
+      configurable: true,
+      writable: true,
+      value: subType
+    }
+  })
+
+  // 继承父类静态方法
+  Object.setPrototypeOf(subType, superType)
+}
+```
 
 ### 原型链图解
 ![prototype](../assets/img/object-1.png)

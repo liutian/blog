@@ -1,6 +1,13 @@
 ### 声明变量的六种方法
 `var` `let` `const` `function` `import` `class`
 
+### 基本数据类型
+`string` `number` `boolean` `null` `undefined` `symbol` `bigint`
+
+### 类型判断
+- `typeof` 可以判断变量属于哪种基本数据类型，引用数据类型，统一返回 `object`，而函数则返回 `function`
+- `instanceof` 可以判断变量基于哪个函数或者类直接或者间接实例化的，即可以 `追溯原型链`
+- `Object.prototype.toString.call(v)` 既可以判断基本数据类型又可以判断原生引用类型
 
 ### 三种作用域
 - 全局作用域
@@ -314,7 +321,8 @@ window.b // undefined
 
 **JSON.stringify实现深度拷贝的弊端**
 - 拷贝带有循环引用的对象时会报错
-- 无法拷贝函数  
+- 无法拷贝函数、正则  
+- 对象丢失原有constructor，并指向Object
 
 **高性能JSON.stringify实现思路**
 - 开发者事先定义 `JSON scheme`
