@@ -1,6 +1,13 @@
 ### 声明变量的六种方法
 `var` `let` `const` `function` `import` `class`
 
+### 基本数据类型
+`string` `number` `boolean` `null` `undefined` `symbol` `bigint`
+
+### 类型判断
+- `typeof` 可以判断变量属于哪种基本数据类型，引用数据类型，统一返回 `object`，而函数则返回 `function`
+- `instanceof` 可以判断变量基于哪个函数或者类直接或者间接实例化的，即可以 `追溯原型链`
+- `Object.prototype.toString.call(v)` 既可以判断基本数据类型又可以判断原生引用类型
 
 ### 三种作用域
 - 全局作用域

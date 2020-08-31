@@ -193,5 +193,28 @@ BigInt.parseInt('9007199254740993', 10)
 - `Math.fround` 方法返回一个数的32位单精度浮点数形式，将64位双精度浮点数转为32位单精度浮点数。如果小数的精度超过24个二进制位，返回值就会不同于原值，否则返回值不变，可用于判断一个数是否是存在小数误差
 
 
-
-
+### 案例技巧
+- 生成随机ID
+```js
+const genID = length => Math.random().toString(36).substr(3, len);
+genID(20)
+```
+- 生成随机HEX色值
+```js
+const genColor = () => "#" + Math.floor(Math.random() * 0xffffff).toString(16).padEnd(6, "0");
+genColor()
+```
+- 取整
+```js
+const num1 = ~~ 6.66
+const num2 = 6.66 | 0
+const num3 = 6.66 >> 0
+const num4 = Math.floor(6.66)
+const num5 = Math.ceil(6.66)
+```
+- 取最大最小值
+```js
+const arr = [0, 1, 2];
+const min = Math.min(...arr);
+const max = Math.max(...arr);
+```
