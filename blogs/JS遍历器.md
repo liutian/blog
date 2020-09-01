@@ -39,7 +39,7 @@ interface IterationResult {
 }
 ```
 - 原生实现遍历器接口的数据结构  
-`Array` `Map` `Set` `String` `TypedArray` `函数的 arguments 对象` `NodeList 对象`  
+`Array` `Map` `Set` `String` `函数的 arguments 对象` `NodeList` `HTMLCollection`
 - 遍历器使用场景
 ```
 // 解构赋值
