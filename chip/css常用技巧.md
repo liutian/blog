@@ -111,7 +111,6 @@ x为设计稿中 字体/屏幕宽 比值
   background-color: #000;
   height: 1px;
   transform: scaleY(0.5);
-  transform-origin: 50% 100%;
 }
 ```
 

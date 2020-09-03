@@ -212,3 +212,37 @@ img.decode()
   - `print()`
   - `prompt()`
   - `scrollX()`
+
+
+### 获取 `form` 下所有表单元素的值
+```html
+<form id="demo">
+  <input type="text" name="t1">
+
+  <input type="checkbox" name="c1" value="c1v">
+  <input type="checkbox" name="c2" value="c2v">
+  <input type="checkbox" name="c3" value="c3v">
+
+  <input type="radio" name="r1" value="r1v">
+  <input type="radio" name="r1" value="r2v">
+  <input type="radio" name="r1" value="r3v">
+
+  <select name="s1">
+    <option value="111">111</option>
+    <option value="222">222</option>
+    <option value="333">333</option>
+  </select>
+
+  <textarea name="a1" ></textarea>
+
+  <input type="hidden" name="h1" value="h1v">
+</form>
+```
+
+```js
+let formEle = document.getElementById('demo');
+let formData = new FormData(formEle);
+for(let [key,value] of formData){
+  ...
+}
+```

@@ -197,7 +197,7 @@ class Student extends Human {
 
 
 ### 子类 __proto__ 与 prototype
-- 子类的 `__proto__` 属性，表示构造函数的继承，总是指向父类
+- 子类 `__proto__` 属性，表示构造函数的继承，总是指向父类
 - 子类 `prototype` 属性的 `__proto__` 属性，表示方法的继承，总是指向父类的prototype属性
 ```js
 class A {
@@ -248,7 +248,7 @@ A.prototype.__proto__ === Object.prototype // true
 
 ### 实现ES6的class
 ```js
-functioni inherit(subType, superType){
+function inherit(subType, superType){
   subType.prototype = Object.create(superType.prototype,{
     constructor: {
       enumerable: false,
@@ -261,6 +261,12 @@ functioni inherit(subType, superType){
   // 继承父类静态方法
   Object.setPrototypeOf(subType, superType)
 }
+
+function subType(...args){
+  superType.call(this,...args)
+}
+
+function superType(){ }
 ```
 
 ### 原型链图解
