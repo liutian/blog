@@ -145,7 +145,7 @@ string.replace(/(\d{4})-(\d{2})-(\d{2})/g,(match, y, m, d) => {
 /\d{4}(-|\/|\.)\d{2}\1\d{2}/
 ```
 - 模拟字符串trim 方法 `' xx '.replace(/^\s+|\s+$/,'')` 
-- 将字符串中的单词首字母大写 `'wedf Sdf 324 sdqww SdfFS'.replace(/(^|\s)([a-z])/g,(c) => c.toUpperCase())`
+- 将字符串中的单词首字母大写 `'wedf Sdf 324 sdqww SdfFS'.replace(/(\b[a-z])/g,(c) => c.toUpperCase())`
 - css属性驼峰化 background-color —> backgroundColor  -moz-transform —> mozTransform
 - css属性反向去驼峰化 backgroundColor —> background-color
 - 匹配成对标签 `<div>xx</div> —> true  <div>xxx</p> —> false`
