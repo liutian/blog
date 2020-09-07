@@ -46,7 +46,7 @@
 <link rel="prerender" href="//example.com/next-page.html">
 ```
 
-  - `reload` 提供当前页面资源加载优先级，比预加载的资源优先级更高，不会阻碍其他文件的加载
+  - `preload` 提供当前页面资源加载优先级，比预加载的资源优先级更高，不会阻碍其他文件的加载
 
 ```html
 <link rel="preload" href="mystyles.css" as="style" onload="this.rel='stylesheet'">
