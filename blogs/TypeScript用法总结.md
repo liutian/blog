@@ -638,6 +638,22 @@ let squareOptions = { colour: "red", width: 100 };
 let mySquare = createSquare(squareOptions);
 ```
 
+### !非空断言
+用于断言操作对象是非 `null` 和非 `undefined` 类型
+```js
+function myFunc(maybeString: string | undefined | null) {
+  const onlyString: string = maybeString; // Error
+  const ignoreUndefinedAndNull: string = maybeString!; // Ok
+}
+
+
+type NumGenerator = () => number;
+
+function myFunc(numGenerator: NumGenerator | undefined) {
+  const num1 = numGenerator(); // Error
+  const num2 = numGenerator!(); //OK
+}
+```
 
 ### 定义全局变量
 ```ts
