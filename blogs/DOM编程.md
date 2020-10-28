@@ -246,3 +246,77 @@ for(let [key,value] of formData){
   ...
 }
 ```
+
+### 尺寸坐标
+![图1](../assets/img/dom-1.png) 
+
+clientWidth / clientHeight
+
+指元素内容 + 内边距所占空间的大小（滚动条占用的空间不计算在内）,受元素box-sizing取值会影响
+
+clientTop / clientLeft
+
+指元素上边框 / 左边框的宽度
+
+offsetWidth / offsetHeight
+
+指元素内容区域 + 内边距 + 边框
+
+offsetTop / offsetLeft
+
+指元素边框相对于对于offsetParent元素内边距的距离
+
+元素offsetParent获取方式：
+
+元素自身有fixed定位，offsetParent的结果为null
+元素自身无fixed定位，且父级元素都未经过定位，offsetParent的结果为<body>
+元素自身无fixed定位，且父级元素存在经过定位的元素，offsetParent的结果为离自身元素最近的经过定位的父级元素
+*** 这里的元素定位指position不等于static
+
+复杂场景：
+![图2](../assets/img/dom-2.png) 
+
+QA  如何获取元素相对于整个页面的坐标？
+
+element.getBoundingClientRect
+
+获取元素相对于浏览器视口左上角的坐标
+
+QA 如何实现图片懒加载？
+
+window.getComputedStyle
+
+获取元素实际样式值
+
+QA window.getComputedStyle 和 element.style 有什么区别？
+
+鼠标光标相关的坐标：
+
+pageX / pageY 鼠标光标相对于页面左上角的坐标
+
+clientX / clientY 鼠标光标相对于浏览器视口左上角的坐标
+
+screenX / screenY 鼠标光标相对于屏幕左上角的坐标
+
+offsetX / offsetY 鼠标光标相对于当前元素（事件对象的target）左上角的坐标 
+
+
+![图3](../assets/img/dom-3.png) 
+
+window.innerWidth  /  window.innerHeight 
+
+指浏览器视口的宽高
+
+window.outerWidth  /  window.outerHeight
+
+指浏览器窗口的宽高（包括浏览器标签，书签，地址栏，状态栏）
+
+![图4](../assets/img/dom-4.png) 
+
+window.screen.width  /  window.screen.height
+
+指电脑屏幕的像素分辨率
+
+window.screen.availWidth  /  window.screen.availHeight
+
+指排除掉系统状态栏等ui之后浏览器最大化之后可以使用的空间
