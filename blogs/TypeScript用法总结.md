@@ -16,7 +16,9 @@ a.toFixed(); // 依然报错， a 不会被推导 为 number
 #### void
 声明一个 `void` 类型的变量没有什么作用，因为它的值只能为 `undefined` 或 `null`
 ```ts
-let unusable: void = undefined;
+function run(): void {
+  return 'hello' // 报错方法声明永远不会返回值
+}
 ```
 
 #### never
