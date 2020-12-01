@@ -91,7 +91,7 @@ class A {
 
 ### 技巧
 ```ts
-// 巧用查找类型+泛型+keyof
+// 泛型继承+keyof
 interface API {
   '/user': { name: string },
   '/menu': { foods: Food[] },
