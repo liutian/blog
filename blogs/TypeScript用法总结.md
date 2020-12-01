@@ -81,8 +81,7 @@ const a: a | b = {a: 3, b: 4}
 ### 类实例属性快速定义
 ```ts
 class A {
-  constructor(readonly name: string, protected address: string, private age: number) {
-  }
+  constructor(readonly name: string, protected address: string, private age: number) { }
 
   info() {
     console.log(`name: ${this.name} address: ${this.address} age: ${this.age}`)
