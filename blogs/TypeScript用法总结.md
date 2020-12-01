@@ -70,12 +70,12 @@ interface A {
     b: number;
 }
 
-const a: A = {a: 3, b: 4}
+const c: A = {a: 3, b: 4}
 
 
 type a = {a: number}
 type b = {b: number}
-const a: a|b = {a: 3, b: 4}
+const a: a | b = {a: 3, b: 4}
 ```
 
 ### 类实例属性快速定义
