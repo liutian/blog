@@ -1,35 +1,37 @@
+TypeScript 的类型是 JavaScript 类型的超集。但是从更深层次上来说，两者的本质是不一样的，一个是变量的类型，一个是值的类型。现阶段 TypeScript 不算真正意义上的语言，而是围绕 JavaScript 语言的一种高级注释
 
-TypeScript 的类型是 JavaScript 类型的超集。但是从更深层次上来说，两者的本质是不一样的，一个是值的类型，一个是变量的类型
+### 类型推导
 
-类型推导是仅仅在初始化的时候进行推导
+仅仅在初始化的时候进行类型推导
 
 ```ts
 let a = "lucifer"; // 我们没有给 a 声明类型， a 被推导为string
-a.toFixed(); // Property 'toFixed' does not exist on type 'string'.
+a.toFixed(); // Error
 a.includes("1"); // ok
 a = 1;
 a.toFixed(); // 依然报错， a 不会被推导 为 number
 ```
 
-### 特殊类型
+### 特殊类型 - void
 
-#### void
-声明一个 `void` 类型的变量没有什么作用，因为它的值只能为 `undefined` 或 `null`
+声明一个 `void` 类型的变量没有什么作用，因为它的值只能为 `undefined` 或 `null`，常用于声明方法没有返回值
+
 ```ts
-let unusable: void = undefined;
+function fn1(): void {}
 ```
 
-#### never
-使用 `never` 避免出现新增了联合类型没有对应的实现，目的就是写出类型绝对安全的代码。
+### 特殊类型 - never
+
+使用 `never` 避免出现新增了联合类型没有对应的实现，目的就是写出类型绝对安全的代码
 
 ```ts
-/** 
+/**
  * 如果Foo后续开发被修改为 type Foo = string | number | boolean
  * 同时 controlFlowAnalysisWithNever 方法流程控制没有一并修改，
  * 这时else 分支的 foo 类型会被收窄为 boolean 类型
  * 导致无法赋值给 never 类型，这时就会产生一个编译错误
-*/
-//  
+ */
+//
 type Foo = string | number;
 
 function controlFlowAnalysisWithNever(foo: Foo) {
@@ -44,12 +46,13 @@ function controlFlowAnalysisWithNever(foo: Foo) {
 }
 ```
 
-#### unknow和any区别
+### 特殊类型 - unknow | any
+
 - 不能直接将 `unknow` 类型变量赋值给除 `any | unknow` 之外类型变量，但是可以将 `any` 类型变量赋值给任意其他类型变量
-- 不能对 `any` 进行任何操作
+- 不能对 `unknow` 进行任何操作
 
 ```ts
-let value: unknown;
+let value: unknown; // 将 unknown 替换为 any 下列语句不会编译报错
 
 value.foo.bar; // Error
 value.trim(); // Error
@@ -58,143 +61,142 @@ new value(); // Error
 value[0][1]; // Error
 ```
 
-### type和interface区别
+### type 和 interface 区别
+
 ```ts
-interface A {
-    a: number;
+// interface 可以重复声明
+interface TypeA {
+  name: string;
 }
-
-interface A {
-    b: number;
+interface TypeA {
+  age: number;
 }
+const student: TypeA = { name: "tom", age: 4 };
 
-const a: A = {a: 3, b: 4}
+// type 不可重复声明
+type typea = { name: string };
+type typea = { age: number }; // Error
 
-
-type a = {a: number}
-type b = {b: number}
-const a: a|b = {a: 3, b: 4}
+// 要想达到 interface 同样效果需要使用 &
+type typea = { name: string };
+type typeb = { age: number };
+type TypeA = typea & typeb;
+const student: TypeA = { name: "tom", age: 4 };
 ```
 
-### 类实例属性快速定义
-```ts
-class A {
-  constructor(readonly name: string, protected address: string, private age: number) {
-  }
+### 联合类型
 
-  info() {
-    console.log(`name: ${this.name} address: ${this.address} age: ${this.age}`)
-  }
+```ts
+// Dinner 要么有 fish 要么有 bear
+type dinnerFish = {
+  size: number;
+  fishCount: number;
+};
+type dinnerBear = {
+  size: number;
+  bearCount: number;
+};
+type Dinner = dinnerFish | dinnerBear;
+
+function eat(dinner: Dinner) {
+  console.log(dinner.size);
+  console.log(dinner.fishCount); // Error
 }
+
+let dinner: Dinner = {}; // Error
+let dinner: Dinner = { size: 1, bearCount: 1 };
+eat({ size: 1 }); // Error
+eat({ size: 1, bearCount: 1 });
 ```
 
-### 技巧
+### 小技巧
+
 ```ts
-// 巧用查找类型+泛型+keyof
+// 接口地址和响应结果映射
 interface API {
-  '/user': { name: string },
-  '/menu': { foods: Food[] },
+  "/user": { name: string };
+  "/course": { score: number };
 }
 const get = <URL extends keyof API>(url: URL): Promise<API[URL]> => {
-  return fetch(url).then(res => res.json())
-}
-
+  return fetch(url).then((res) => res.json());
+};
 
 // 巧用显式泛型
-function $<T extends HTMLElement>(id: string):T {
-  return document.getElementById(id)
+function $<T extends HTMLElement>(id: string): T {
+  return document.getElementById(id) as T;
 }
 
-$<HTMLInputElement>('input').value
+$<HTMLInputElement>("input").value;
 
+// 数组只读
+let arr1: number[] = [1, 2, 3, 4];
+let arr2: ReadonlyArray<number> = arr1;
+
+arr2[0] = 12; // Error
+arr2.push(5); // Error
+arr2.length = 100; // Error
+arr1 = arr2; // Error
 
 // 巧用 DeepReadonly
 type DeepReadonly<T> = {
   readonly [P in keyof T]: DeepReadonly<T[P]>;
-}
+};
 
-const a = { foo: { bar: 22 } }
-const b = a as DeepReadonly<typeof a>
-b.foo.bar = 33 // Hey, stop!
+const a = { foo: { bar: 22 } };
+const b = a as DeepReadonly<typeof a>;
+b.foo.bar = 33; // Error
 
+const toArray = <T>(element: T) => [element]; // Error
 
+const toArray = <T extends {}>(element: T) => [element]; // Ok
 
-// 巧用tsx+extends
-const toArray = <T>(element: T) => [element]; // Error in .tsx file.
+// 类实例属性快速定义
+class A {
+  constructor(
+    readonly name: string,
+    protected address: string,
+    private age: number
+  ) {}
 
-const toArray = <T extends {}>(element: T) => [element]; // No errors.
-
-
-
-// 巧用ClassOf
-interface ClassOf<T> {
-  new (...args: any[]): T;
-}
-const renderAnimal = (AnimalComponent: ClassOf<Animal>) => {
-  return <AnimalComponent/>; // Good!
-}
-
-renderAnimal(Cat); // Good!
-renderAnimal(Dog); // Good!
-
-
-// 巧用类型查找+类方法
-class Parent extends React.PureComponent {
-  private updateHeader = (title: string, subTitle: string) => {
-    // Do it.
-  };
-  render() {
-    return <Child updateHeader={this.updateHeader}/>;
+  info() {
+    console.log(`name: ${this.name} address: ${this.address} age: ${this.age}`);
   }
 }
 
-interface ChildProps {
-  updateHeader: Parent['updateHeader'];
-}
-class Child extends React.PureComponent<ChildProps> {
-  private onClick = () => {
-    this.props.updateHeader('Hello', 'Typescript');
-  };
-  render() {
-    return <button onClick={this.onClick}>Go</button>;
+// 自定义类型保护的类型谓词
+function fn1(arg: number | string) {
+  if (typeof arg === "number") {
+    arg.toFixed(2);
+  } else {
+    arg.split(",");
   }
 }
-```
 
-### 联合类型
-```ts
-// Dinner 要么有 fish 要么有 bear 。
-type Dinner = {
-  size: number,
-  fish: number,
-} | {
-  size: number,
-  bear: number,
+type type1 = { method1: Function };
+type type2 = { method2: Function };
+
+function fn2(arg: type1 | type2) {
+  if (isType1(arg)) {
+    arg.method1();
+  } else {
+    arg.method2();
+  }
 }
 
-function eat(dinner: Dinner) {
-  console.log(dinner.size);
-  console.log(dinner.fish); // Erro
+function isType1(arg: any): arg is type1 {
+  return "method1" in arg;
 }
-
-let dinner: Dinner = {}  // Error
-let dinner: Dinner = {size:1, bear:1} 
-eat({size: 1}) // Error
-eat({size:1, bear:1}) 
 ```
 
+### 特殊操作符 - typeof
 
-
-### 泛型操作符
-
-#### typeof
 ```ts
 interface Person {
   name: string;
   age: number;
 }
 
-const tom: Person = { name: 'tom', age: 30 };
+const tom: Person = { name: "tom", age: 30 };
 type Tom = typeof tom; // -> Person
 
 function toArray(x: number): number[] {
@@ -203,9 +205,11 @@ function toArray(x: number): number[] {
 
 type Func = typeof toArray; // -> (x: number) => number[]
 ```
-当一个类型总有一个字面量初始值时，可以先定义字面量值，然后基于字面量定义类型，可以减少重复代码
 
-#### keyof
+当一个类型总有一个字面量初始值时，可以先定义字面量值，然后基于字面量使用 `typeof` 定义类型，可以减少重复代码
+
+#### 特殊操作符 - keyof ????
+
 ```ts
 interface Person {
   name: string;
@@ -213,30 +217,31 @@ interface Person {
 }
 
 type K1 = keyof Person; // "name" | "age"
-type K2 = keyof Person[]; // "length" | "toString" | "pop" | "push" | "concat" | "join" 
-type K3 = keyof { [x: string]: Person };  // string | number
+type K2 = keyof Person[]; // "length" | "toString" | "pop" | "push" | "concat" | "join"
+type K3 = keyof { [x: string]: Person }; // string | number
 ```
 
-#### in
+### 特殊操作符 - in
+
 ```ts
-type Keys = "a" | "b" | "c"
+type Keys = "a" | "b" | "c";
 
-type Obj =  {
-  [p in Keys]: any
-} // -> { a: any, b: any, c: any }
+type Obj = {
+  [p in Keys]: any;
+}; // -> { a: any, b: any, c: any }
 ```
 
-#### extends
+### 特殊操作符 - extends
+
 ```ts
 interface Lengthwise {
   length: number;
 }
 
 function loggingIdentity<T extends Lengthwise>(arg: T): T {
-  console.log(arg.length); // Now we know it has a .length property, so no more error
+  console.log(arg.length);
   return arg;
 }
-
 
 function getProperty<T, K extends keyof T>(obj: T, key: K) {
   return obj[key];
@@ -248,7 +253,8 @@ getProperty(x, "a");
 getProperty(x, "m"); // Error
 ```
 
-### 泛型条件判断
+### 三元运算符与类型判断 ????
+
 ```ts
 // 案例一
 type BoxedValue<T> = { value: T };
@@ -257,7 +263,7 @@ type Boxed<T> = T extends any[] ? BoxedArray<T[number]> : BoxedValue<T>;
 
 type T1 = Boxed<string>;
 //   ^ = type T1 = {  value: string;  }
-    
+
 type T2 = Boxed<number[]>;
 //   ^ = type T2 = {  array: number[]; }
 type T3 = Boxed<string | number[]>;
@@ -307,6 +313,7 @@ Declaration or statement expected.
 ```
 
 ### 泛型类型提取
+
 ```ts
 type Foo<T> = T extends { a: infer U; b: infer U } ? U : never;
 
@@ -316,7 +323,8 @@ type T2 = Foo<{ a: string; b: number }>;
 //   ^ = type T2 = string | number
 ```
 
-### 函数类型泛型
+### 函数泛型简写
+
 ```ts
 function identity<T>(arg: T): T {
   return arg;
@@ -328,6 +336,7 @@ let myIdentity: { <T>(arg: T): T } = identity;
 ```
 
 ### 泛型缩形
+
 ```ts
 interface GenericIdentityFn<T> {
   (arg: T): T;
@@ -340,45 +349,14 @@ function identity<T>(arg: T): T {
 let myIdentity: GenericIdentityFn<number> = identity;
 ```
 
+### 枚举 与 keyof
 
-### 自定义类型保护的类型谓词
-```ts
-function isFish(pet: Fish | Bird): pet is Fish {
-  return (pet as Fish).swim !== undefined;
-}
-
-let pet = getSmallPet();
-
-if (isFish(pet)) {
-  pet.swim();
-} else {
-  pet.fly();
-}
-
-// as 类型断言
-if ((pet as Fish).swim) {
-  (pet as Fish).swim();
-} else {
-  (pet as Bird).fly();
-}
-
-// in 类型断言
-if ('swim' in pet) {
-  pet.swim();
-} else{
-  pet.fly();
-}
-
-```
-
-
-### 枚举keyof特殊性
 ```ts
 enum LogLevel {
   ERROR,
   WARN,
   INFO,
-  DEBUG
+  DEBUG,
 }
 
 type LogLevelStrings = keyof typeof LogLevel;
@@ -386,16 +364,18 @@ type LogLevelStrings = keyof typeof LogLevel;
 function printImportant(key: LogLevelStrings, message: string) {
   const num = LogLevel[key];
   if (num <= LogLevel.WARN) {
-    console.log("Log level key is:", key);
-    console.log("Log level value is:", num);
     console.log("Log level message is:", message);
   }
 }
+
 printImportant("ERROR", "This is a message");
+
+let levelStr = "ERROR";
+printImportant(levelStr, "This is a message"); // Error
 ```
 
-
 ### 限制类只能继承不能直接实例化
+
 ```ts
 class Person {
   protected name: string;
@@ -404,7 +384,6 @@ class Person {
   }
 }
 
-// Employee can extend Person
 class Employee extends Person {
   private department: string;
 
@@ -412,18 +391,14 @@ class Employee extends Person {
     super(name);
     this.department = department;
   }
-
-  public getElevatorPitch() {
-    return `Hello, my name is ${this.name} and I work in ${this.department}.`;
-  }
 }
 
-let howard = new Employee("Howard", "Sales");
+let howard = new Employee("Howard", "Sales"); // Ok
 let john = new Person("John"); // Error
 ```
 
-
 ### 接口继承类
+
 ```ts
 class Point {
   x: number;
@@ -438,6 +413,7 @@ let point3d: Point3d = { x: 1, y: 2, z: 3 };
 ```
 
 ### 通过接口定义函数
+
 ```ts
 interface SearchFunc {
   (source: string, subString: string): boolean;
@@ -451,126 +427,8 @@ mySearch = function (source: string, subString: string) {
 };
 ```
 
-### 字符串字面量类型
-```ts
-type Easing = "ease-in" | "ease-out" | "ease-in-out";
+### 如果接口中构造函数和普通方法必须分离?????
 
-class UIElement {
-  animate(dx: number, dy: number, easing: Easing) {
-    if (easing === "ease-in") {
-      // ...
-    } else if (easing === "ease-out") {
-    } else if (easing === "ease-in-out") {
-    } else {
-      // It's possible that someone could reach this
-      // by ignoring your types though.
-    }
-  }
-}
-
-let button = new UIElement();
-button.animate(0, 0, "ease-in");
-button.animate(0, 0, "uneasy");
-Argument of type '"uneasy"' is not assignable to parameter of type 'Easing'.
-```
-
-### 函数类型快速定义
-```ts
-let myAdd: (x: number, y: number) => number = function (
-  x: number,
-  y: number
-): number {
-  return x + y;
-};
-```
-
-
-### 方法重载
-```ts
-let suits = ["hearts", "spades", "clubs", "diamonds"];
-
-function pickCard(x: { suit: string; card: number }[]): number;
-function pickCard(x: number): { suit: string; card: number };
-function pickCard(x: any): any {
-  // Check to see if we're working with an object/array
-  // if so, they gave us the deck and we'll pick the card
-  if (typeof x == "object") {
-    let pickedCard = Math.floor(Math.random() * x.length);
-    return pickedCard;
-  }
-  // Otherwise just let them pick the card
-  else if (typeof x == "number") {
-    let pickedSuit = Math.floor(x / 13);
-    return { suit: suits[pickedSuit], card: x % 13 };
-  }
-}
-
-let myDeck = [
-  { suit: "diamonds", card: 2 },
-  { suit: "spades", card: 10 },
-  { suit: "hearts", card: 4 },
-];
-
-let pickedCard1 = myDeck[pickCard(myDeck)];
-alert("card: " + pickedCard1.card + " of " + pickedCard1.suit);
-
-let pickedCard2 = pickCard(15);
-alert("card: " + pickedCard2.card + " of " + pickedCard2.suit);
-```
-
-
-
-### 设置函数this类型
-```ts
-interface Card {
-  suit: string;
-  card: number;
-}
-
-interface Deck {
-  suits: string[];
-  cards: number[];
-  createCardPicker(this: Deck): () => Card;
-}
-
-let deck: Deck = {
-  suits: ["hearts", "spades", "clubs", "diamonds"],
-  cards: Array(52),
-  // NOTE: The function now explicitly specifies that its callee must be of type Deck
-  createCardPicker: function (this: Deck) {
-    return () => {
-      let pickedCard = Math.floor(Math.random() * 52);
-      let pickedSuit = Math.floor(pickedCard / 13);
-
-      return { suit: this.suits[pickedSuit], card: pickedCard % 13 };
-    };
-  },
-};
-
-let cardPicker = deck.createCardPicker();
-let pickedCard = cardPicker();
-
-alert("card: " + pickedCard.card + " of " + pickedCard.suit);
-```
-
-
-### 数组只读
-```ts
-let a: number[] = [1, 2, 3, 4];
-let ro: ReadonlyArray<number> = a;
-
-ro[0] = 12; // error!
-Index signature in type 'readonly number[]' only permits reading.
-ro.push(5); // error!
-Property 'push' does not exist on type 'readonly number[]'.
-ro.length = 100; // error!
-Cannot assign to 'length' because it is a read-only property.
-a = ro; // error!
-The type 'readonly number[]' is 'readonly' and cannot be assigned to the mutable type 'number[]'.
-```
-
-
-### 构造函数和普通方法必须分离
 ```ts
 interface ClockConstructor {
   new (hour: number, minute: number);
@@ -588,8 +446,25 @@ const Clock: ClockConstructor = class Clock implements ClockInterface {
 };
 ```
 
+### 规定函数执行时的 `this` 指向
+
+```ts
+type student = {
+  name: string;
+};
+
+function introduce(this: student): string {
+  return `I am ${this.name}`;
+}
+
+introduce(); // Error
+introduce({ name: "jack" }); // Error
+
+introduce.apply({ name: "jack" }); // Ok
+```
 
 ### 定义函数属性
+
 ```ts
 interface Counter {
   (start: number): string;
@@ -610,42 +485,43 @@ c.reset();
 c.interval = 5.0;
 ```
 
+### 函数参数为对象时，对象属性检查
 
-### 属性检查
 ```ts
-interface SquareConfig {
-  color?: string;
-  width?: number;
+interface Student {
+  name?: string;
+  age?: number;
 }
 
-function createSquare(config: SquareConfig): { color: string; area: number } {
-  return { color: config.color || "red", area: config.width || 20 };
-}
+function fn1(student: Student) {}
 
-let mySquare = createSquare({ colour: "red", width: 100 }); 
-// Error Argument of type '{ colour: string; width: number; }' is not assignable to parameter of type 'SquareConfig'.
-//  Object literal may only specify known properties, but 'colour' does not exist in type 'SquareConfig'. Did you mean to write 'color'?
+fn1({ nickname: "tom", age: 100 }); // Error
 
-// 解决方案
-interface SquareConfig {
-  color?: string;
-  width?: number;
+// 解决方案一
+interface Student {
+  name?: string;
+  age?: number;
   [propName: string]: any;
 }
 
-// 或者
-let squareOptions = { colour: "red", width: 100 };
-let mySquare = createSquare(squareOptions);
+// 解决方案二
+let student = { nickname: "tom", age: 100 };
+fn1(student);
+
+// 注意解决方案一
+let student = { nickname: "tom", score: 100 };
+fn1(student); // Error
 ```
 
 ### !非空断言
+
 用于断言操作对象是非 `null` 和非 `undefined` 类型
+
 ```js
 function myFunc(maybeString: string | undefined | null) {
   const onlyString: string = maybeString; // Error
   const ignoreUndefinedAndNull: string = maybeString!; // Ok
 }
-
 
 type NumGenerator = () => number;
 
@@ -656,6 +532,7 @@ function myFunc(numGenerator: NumGenerator | undefined) {
 ```
 
 ### 定义全局变量
+
 ```ts
 declare var var1: number;
 
@@ -663,29 +540,3 @@ declare function fn1();
 ```
 
 [深入理解 TypeScript](https://github.com/jkchao/typescript-book-chinese)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
