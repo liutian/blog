@@ -1,4 +1,4 @@
-TypeScript 的类型是 JavaScript 类型的超集。但是从更深层次上来说，两者的本质是不一样的，一个是变量的类型，一个是值的类型。现阶段 TypeScript 不算真正意义上的语言，而是围绕 JavaScript 语言的一种高级注释
+TypeScript 的类型是 JavaScript 类型的超集。但是从更深层次上来说，两者的本质是不一样的，一个是变量的类型，一个是值的类型。现阶段 TypeScript 不算真正意义上的语言，而是围绕 JavaScript 语言的一种高级注释，同时它会自动检查代码，找出那些逃过我们眼睛的 bug
 
 ### 类型推导
 
@@ -13,10 +13,6 @@ a.toFixed(); // 依然报错， a 不会被推导 为 number
 ```
 
 ### 特殊类型 - void
-
-声明一个 `void` 类型的变量没有什么作用，因为它的值只能为 `undefined` 或 `null`，常用于声明方法没有返回值
-
-#### void
 
 因为它的值只能为 `undefined` 或 `null`，所以常用于声明方法没有返回值
 
@@ -54,12 +50,13 @@ function controlFlowAnalysisWithNever(foo: Foo) {
 
 ### 特殊类型 - unknow | any
 
+- 可以将任意类型赋值给 `any | unknow`
 - 不能直接将 `unknow` 类型变量赋值给除 `any | unknow` 之外类型变量，但是可以将 `any` 类型变量赋值给任意其他类型变量
 - 不能对 `unknow` 进行任何操作
 
 ```ts
-let value: unknown; // 将 unknown 替换为 any 下列语句不会编译报错
-
+let value: unknown;
+// 将 unknown 替换为 any 下列语句不会编译报错
 value.foo.bar; // Error
 value.trim(); // Error
 value(); // Error
@@ -70,23 +67,23 @@ value[0][1]; // Error
 ### type 和 interface 区别
 
 ```ts
-// interface 可以重复声明
+// type 不可重复声明
+type typea = { name: string };
+type typea = { age: number }; // Error
+
+// 通过 & 扩充类型
+type typea = { name: string };
+type typeb = { age: number };
+type TypeA = typea & typeb;
+const student: TypeA = { name: "tom", age: 4 };
+
+// interface 可以重复声明，可以更方便实现扩充类型
 interface TypeA {
   name: string;
 }
 interface TypeA {
   age: number;
 }
-const student: TypeA = { name: "tom", age: 4 };
-
-// type 不可重复声明
-type typea = { name: string };
-type typea = { age: number }; // Error
-
-// 要想达到 interface 同样效果需要使用 &
-type typea = { name: string };
-type typeb = { age: number };
-type TypeA = typea & typeb;
 const student: TypeA = { name: "tom", age: 4 };
 ```
 
@@ -134,6 +131,19 @@ function $<T extends HTMLElement>(id: string): T {
 
 $<HTMLInputElement>("input").value;
 
+// 类实例属性快速定义
+class A {
+  constructor(
+    readonly name: string,
+    protected address: string,
+    private age: number
+  ) {}
+
+  info() {
+    console.log(`name: ${this.name} address: ${this.address} age: ${this.age}`);
+  }
+}
+
 // 数组只读
 let arr1: number[] = [1, 2, 3, 4];
 let arr2: ReadonlyArray<number> = arr1;
@@ -155,19 +165,6 @@ b.foo.bar = 33; // Error
 const toArray = <T>(element: T) => [element]; // Error
 
 const toArray = <T extends {}>(element: T) => [element]; // Ok
-
-// 类实例属性快速定义
-class A {
-  constructor(
-    readonly name: string,
-    protected address: string,
-    private age: number
-  ) {}
-
-  info() {
-    console.log(`name: ${this.name} address: ${this.address} age: ${this.age}`);
-  }
-}
 
 // 自定义类型保护的类型谓词
 function fn1(arg: number | string) {
@@ -214,7 +211,7 @@ type Func = typeof toArray; // -> (x: number) => number[]
 
 当一个类型总有一个字面量初始值时，可以先定义字面量值，然后基于字面量使用 `typeof` 定义类型，可以减少重复代码
 
-#### 特殊操作符 - keyof ????
+#### 特殊操作符 - keyof
 
 ```ts
 interface Person {
@@ -233,8 +230,8 @@ type K3 = keyof { [x: string]: Person }; // string | number
 type Keys = "a" | "b" | "c";
 
 type Obj = {
-  [p in Keys]: any;
-}; // -> { a: any, b: any, c: any }
+  [p in Keys]: boolean;
+}; // -> { a: boolean, b: boolean, c: boolean }
 ```
 
 ### 特殊操作符 - extends
@@ -259,7 +256,25 @@ getProperty(x, "a");
 getProperty(x, "m"); // Error
 ```
 
-### 三元运算符与类型判断 ????
+### 特殊操作符 - !非空断言
+
+用于断言操作对象是非 `null` 和非 `undefined` 类型
+
+```js
+function myFunc(maybeString: string | undefined | null) {
+  const onlyString: string = maybeString; // Error
+  const ignoreUndefinedAndNull: string = maybeString!; // Ok
+}
+
+type NumGenerator = () => number;
+
+function myFunc(numGenerator: NumGenerator | undefined) {
+  const num1 = numGenerator(); // Error
+  const num2 = numGenerator!(); //OK
+}
+```
+
+### 特殊操作符 - ?
 
 ```ts
 // 案例一
@@ -268,13 +283,11 @@ type BoxedArray<T> = { array: T[] };
 type Boxed<T> = T extends any[] ? BoxedArray<T[number]> : BoxedValue<T>;
 
 type T1 = Boxed<string>;
-//   ^ = type T1 = {  value: string;  }
-
+// {  value: string;  }
 type T2 = Boxed<number[]>;
-//   ^ = type T2 = {  array: number[]; }
+// {  array: number[]; }
 type T3 = Boxed<string | number[]>;
-//   ^ = type T3 = BoxedValue<string> | BoxedArray<number>
-
+// BoxedValue<string> | BoxedArray<number>
 
 // 案例二
 function pluck<T, K extends keyof T>(o: T, propertyNames: K[]): T[K][] {
@@ -293,32 +306,17 @@ let taxi: Car = {
   year: 2014,
 };
 
-// Manufacturer and model are both of type string,
-// so we can pluck them both into a typed string array
-let makeAndModel: string[] = pluck(taxi, ["manufacturer", "model"]);
+let makeAndModel = pluck(taxi, ["manufacturer", "model"]);
 
-// If we try to pluck model and year, we get an
-// array of a union type: (string | number)[]
 let modelYear = pluck(taxi, ["model", "year"]);
-
 
 // 案例三
 type PartialWithNewMember<T> = {
   [P in keyof T]?: T[P];
-} & { newMember: boolean }
-
-// This is an error!
-type WrongPartialWithNewMember<T> = {
-  [P in keyof T]?: T[P];
-  newMember: boolean;
-'boolean' only refers to a type, but is being used as a value here.
-'}' expected.
-}
-Declaration or statement expected.
-
+} & { newMember: boolean };
 ```
 
-### 泛型类型提取
+### 特殊操作符 - infer 泛型类型提取
 
 ```ts
 type Foo<T> = T extends { a: infer U; b: infer U } ? U : never;
@@ -327,32 +325,6 @@ type T1 = Foo<{ a: string; b: string }>;
 //   ^ = type T1 = string
 type T2 = Foo<{ a: string; b: number }>;
 //   ^ = type T2 = string | number
-```
-
-### 函数泛型简写
-
-```ts
-function identity<T>(arg: T): T {
-  return arg;
-}
-
-let myIdentity: <U>(arg: U) => U = identity;
-// 等价于
-let myIdentity: { <T>(arg: T): T } = identity;
-```
-
-### 泛型缩形
-
-```ts
-interface GenericIdentityFn<T> {
-  (arg: T): T;
-}
-
-function identity<T>(arg: T): T {
-  return arg;
-}
-
-let myIdentity: GenericIdentityFn<number> = identity;
 ```
 
 ### 枚举 与 keyof
@@ -378,29 +350,6 @@ printImportant("ERROR", "This is a message");
 
 let levelStr = "ERROR";
 printImportant(levelStr, "This is a message"); // Error
-```
-
-### 限制类只能继承不能直接实例化
-
-```ts
-class Person {
-  protected name: string;
-  protected constructor(theName: string) {
-    this.name = theName;
-  }
-}
-
-class Employee extends Person {
-  private department: string;
-
-  constructor(name: string, department: string) {
-    super(name);
-    this.department = department;
-  }
-}
-
-let howard = new Employee("Howard", "Sales"); // Ok
-let john = new Person("John"); // Error
 ```
 
 ### 接口继承类
@@ -433,7 +382,7 @@ mySearch = function (source: string, subString: string) {
 };
 ```
 
-### 如果接口中构造函数和普通方法必须分离?????
+### 如果接口中构造函数和普通方法必须分离
 
 ```ts
 interface ClockConstructor {
@@ -519,25 +468,33 @@ let student = { nickname: "tom", score: 100 };
 fn1(student); // Error
 ```
 
-### !非空断言
+### 函数泛型简写
 
-用于断言操作对象是非 `null` 和非 `undefined` 类型
-
-```js
-function myFunc(maybeString: string | undefined | null) {
-  const onlyString: string = maybeString; // Error
-  const ignoreUndefinedAndNull: string = maybeString!; // Ok
+```ts
+function identity<T>(arg: T): T {
+  return arg;
 }
 
-type NumGenerator = () => number;
-
-function myFunc(numGenerator: NumGenerator | undefined) {
-  const num1 = numGenerator(); // Error
-  const num2 = numGenerator!(); //OK
-}
+let myIdentity: <U>(arg: U) => U = identity;
+// 等价于
+let myIdentity: { <T>(arg: T): T } = identity;
 ```
 
-### 定义全局变量
+### 泛型缩形
+
+```ts
+interface GenericIdentityFn<T> {
+  (arg: T): T;
+}
+
+function identity<T>(arg: T): T {
+  return arg;
+}
+
+let myIdentity: GenericIdentityFn<number> = identity;
+```
+
+### 声明变量和类型
 
 ```ts
 declare var var1: number;
