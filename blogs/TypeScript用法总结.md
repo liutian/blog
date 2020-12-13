@@ -191,6 +191,51 @@ function isType1(arg: any): arg is type1 {
 }
 ```
 
+### 规定函数执行时的 `this` 指向
+
+```ts
+type student = {
+  name: string;
+};
+
+function introduce(this: student): string {
+  return `I am ${this.name}`;
+}
+
+introduce(); // Error
+introduce({ name: "jack" }); // Error
+
+introduce.apply({ name: "jack" }); // Ok
+```
+
+### 函数参数为对象时，对象属性检查
+
+```ts
+interface Student {
+  name?: string;
+  age?: number;
+}
+
+function fn1(student: Student) {}
+
+fn1({ nickname: "tom", age: 100 }); // Error
+
+// 解决方案一
+interface Student {
+  name?: string;
+  age?: number;
+  [propName: string]: any;
+}
+
+// 解决方案二
+let student = { nickname: "tom", age: 100 };
+fn1(student);
+
+// 注意解决方案一
+let student = { nickname: "tom", score: 100 };
+fn1(student); // Error
+```
+
 ### 特殊操作符 - typeof
 
 ```ts
@@ -382,43 +427,7 @@ mySearch = function (source: string, subString: string) {
 };
 ```
 
-### 如果接口中构造函数和普通方法必须分离
-
-```ts
-interface ClockConstructor {
-  new (hour: number, minute: number);
-}
-
-interface ClockInterface {
-  tick();
-}
-
-const Clock: ClockConstructor = class Clock implements ClockInterface {
-  constructor(h: number, m: number) {}
-  tick() {
-    console.log("beep beep");
-  }
-};
-```
-
-### 规定函数执行时的 `this` 指向
-
-```ts
-type student = {
-  name: string;
-};
-
-function introduce(this: student): string {
-  return `I am ${this.name}`;
-}
-
-introduce(); // Error
-introduce({ name: "jack" }); // Error
-
-introduce.apply({ name: "jack" }); // Ok
-```
-
-### 定义函数属性
+### 通过接口定义函数属性
 
 ```ts
 interface Counter {
@@ -440,32 +449,23 @@ c.reset();
 c.interval = 5.0;
 ```
 
-### 函数参数为对象时，对象属性检查
+### 接口中构造函数和普通方法必须分离
 
 ```ts
-interface Student {
-  name?: string;
-  age?: number;
+interface ClockConstructor {
+  new (hour: number, minute: number);
 }
 
-function fn1(student: Student) {}
-
-fn1({ nickname: "tom", age: 100 }); // Error
-
-// 解决方案一
-interface Student {
-  name?: string;
-  age?: number;
-  [propName: string]: any;
+interface ClockInterface {
+  tick();
 }
 
-// 解决方案二
-let student = { nickname: "tom", age: 100 };
-fn1(student);
-
-// 注意解决方案一
-let student = { nickname: "tom", score: 100 };
-fn1(student); // Error
+const Clock: ClockConstructor = class Clock implements ClockInterface {
+  constructor(h: number, m: number) {}
+  tick() {
+    console.log("beep beep");
+  }
+};
 ```
 
 ### 函数泛型简写
