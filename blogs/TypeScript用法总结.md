@@ -16,8 +16,14 @@ a.toFixed(); // 依然报错， a 不会被推导 为 number
 
 声明一个 `void` 类型的变量没有什么作用，因为它的值只能为 `undefined` 或 `null`，常用于声明方法没有返回值
 
+#### void
+
+因为它的值只能为 `undefined` 或 `null`，所以常用于声明方法没有返回值
+
 ```ts
-function fn1(): void {}
+function run(): void {
+  return "hello"; // 报错方法声明永远不会返回值
+}
 ```
 
 ### 特殊类型 - never
