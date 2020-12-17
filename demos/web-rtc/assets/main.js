@@ -4,8 +4,6 @@ HTMLElement.prototype.click = function (callback) {
 }
 
 
-const pushServer = 'https://10.11.112.14:4430';
-
 const startBtnEle = $('#start-btn');
 const inviteBtnEle = $('#invite-btn');
 const selfVideoEle = $('#self-video');
@@ -31,7 +29,10 @@ function start() {
     // 创建socket通信
     socket = createSocket();
     inviteBtnEle.disabled = false;
-  }).catch(e => alert('getUserMedia error'));
+  }).catch(e => {
+    console.dir(e);
+    alert('getUserMedia error' + e)
+  });
 }
 
 function invite() {
@@ -61,8 +62,9 @@ function invite() {
 function createSocket() {
   const userid = selfNicknameEle.value;
   const uuid = 'uuid_' + userid;
-  const _socket = io.connect('https://10.11.112.14:4430/oms4?uuid=' + uuid + '&userid=' + userid, {
-    path: '/push/socket.io/'
+  const _socket = io.connect(window.demoConfig.pushServer + '/demo?uuid=' + uuid + '&userid=' + userid, {
+    path: '/push/socket.io/',
+    transports: ['polling']
   });
 
   _socket.on('connect', () => {
@@ -145,7 +147,7 @@ function push(data) {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'L29tczQ6MTIzNDU2'
+      authorization: window.demoConfig.pushServerAuth
     },
     body: JSON.stringify(data)
   }).then(response => response.json());
