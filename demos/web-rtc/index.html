@@ -29,12 +29,24 @@
 
   <video id="other-video" autoplay playsinline></video>
 
+  <!-- 移动端调试 -->
   <script src="//cdn.jsdelivr.net/npm/eruda"></script>
   <script>
     eruda.init();
   </script>
-  <script src="https://10.11.112.14:4430/push/socket.io/socket.io.js"></script>
-  <script src="./assets/main.js"></script>
+  <!-- 移动端调试 -->
+
+
+  <script>
+    window.demoConfig = {
+      pushServer: 'https://172.19.2.98:4430',
+      pushServerAuth: 'L2RlbW86MTIzNDU2'
+    }
+
+    document.writeln(`<script src="${window.demoConfig.pushServer}/push/socket.io/socket.io.js"><\/script>`);
+    document.writeln('<script src="./assets/main.js"><\/script>');
+  </script>
+
 </body>
 
-</html>
+</html>　
