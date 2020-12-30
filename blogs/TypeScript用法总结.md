@@ -502,4 +502,67 @@ declare var var1: number;
 declare function fn1();
 ```
 
+### React
+
+```ts
+// 声明事件函数的入参
+onClick(event: React.MouseEvent<HTMLButtonElement>): void;
+
+// 声明组件props类型
+children: React.ReactNode; // 包含所有 children 情况
+style: React.CSSProperties; // 推荐 在内联 style 时使用
+// ✅ 推荐原生 button 标签自带的所有 props 类型
+// 也可以在泛型的位置传入组件 提取组件的 Props 类型
+props: React.ComponentProps<"button">;
+// ✅ 推荐 利用上一步的做法 再进一步的提取出原生的 onClick 函数类型
+// 此时函数的第一个参数会自动推断为 React 的点击事件类型
+onClickButton：React.ComponentProps<"button">["onClick"]
+
+
+React.FC<AppProps>
+// 等同于
+AppProps & {
+  children: React.ReactNode
+  propTypes?: WeakValidationMap<P>;
+  contextTypes?: ValidationMap<any>;
+  defaultProps?: Partial<P>;
+  displayName?: string;
+}
+
+
+// 如果初始值是 null 或 undefined，那就要通过泛型手动传入你期望的类型
+const [user, setUser] = React.useState<IUser | null>(null);
+
+
+// 错误
+useEffect(async () => {
+  const user = await getUser()
+  setUser(user)
+}, [])
+
+// 正确
+useEffect(() => {
+  const getUser = async () => {
+    const user = await getUser()
+    setUser(user)
+  }
+  getUser()
+}, [])
+
+// 使用范型定义useRef的current
+const ref1 = useRef<HTMLElement>(null!);
+
+
+export function useLoading() {
+  const [isLoading, setState] = React.useState(false);
+  const load = (aPromise: Promise<any>) => {
+    setState(true);
+    return aPromise.finally(() => setState(false));
+  };
+  // ✅ 加了 as const 会推断出 [boolean, typeof load]
+  // ❌ 否则会是 (boolean | typeof load)[]
+  return [isLoading, load] as const;[]
+}
+```
+
 [深入理解 TypeScript](https://github.com/jkchao/typescript-book-chinese)
