@@ -19,3 +19,5 @@ docker run -id -p 4430:443 -p 8080:80 --ip [本机IP地址]  --name light-push-d
 ```
 
 > 注意：demo 页面通过 https 访问信令协商服务器，但是当前信令协商服务器证书是没有经过认证的非法证书，需要提前手动同意浏览器强制访问信令协商服务器
+
+[外文资料](https://hpbn.co/webrtc/#incremental-provisioning-trickle-ice)
