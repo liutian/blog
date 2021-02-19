@@ -67,17 +67,11 @@ value[0][1]; // Error
 ### type 和 interface 区别
 
 ```ts
-// type 不可重复声明
+// 同一个文件 type 不可重复声明
 type typea = { name: string };
 type typea = { age: number }; // Error
 
-// 通过 & 扩充类型
-type typea = { name: string };
-type typeb = { age: number };
-type TypeA = typea & typeb;
-const student: TypeA = { name: "tom", age: 4 };
-
-// interface 可以重复声明，可以更方便实现扩充类型
+// 同一个文件 interface 可以重复声明
 interface TypeA {
   name: string;
 }
@@ -85,6 +79,28 @@ interface TypeA {
   age: number;
 }
 const student: TypeA = { name: "tom", age: 4 };
+
+// type 通过 & 扩充类型
+type typeChild1 = { name: string };
+type typeChild2 = { age: number };
+type typeParent = typeChild1 & typeChild2;
+const student: typeParent = { name: "tom", age: 4 };
+
+// interface 通过 extends 扩充类型
+interface Child {}
+interface Parent extends Child {}
+
+// 当 type 包含联合类型时不能被实现和扩展
+type typeChild1 = { name: string };
+type typeChild2 = { age: number };
+
+type typeParent1 = typeChild1 | typeChild2;
+
+interface Parent extends typeParent1 {} // Error
+
+// 交叉类型可以实现和扩展
+type typeParent2 = typeChild1 & typeChild2;
+interface Parent extends typeParent2 {} // OK
 ```
 
 ### 联合类型
