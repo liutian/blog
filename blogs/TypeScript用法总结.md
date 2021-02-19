@@ -103,6 +103,11 @@ type typeParent2 = typeChild1 & typeChild2;
 interface Parent extends typeParent2 {} // OK
 ```
 
+大部分情况 type 和 interface 提供相同功能，可以混用，但是有一下两点需要特别注意：
+
+- 对于 React 组件 props 和 state 尽量使用 type，防止组件被随意修改
+- 当编写第三方库时，导出类型尽量定义为 interface ，这样使用者可以更方便灵活扩展应对复杂场景
+
 ### 联合类型
 
 ```ts
