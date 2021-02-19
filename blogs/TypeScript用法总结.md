@@ -64,6 +64,59 @@ new value(); // Error
 value[0][1]; // Error
 ```
 
+### 联合类型
+
+```ts
+type dinnerFish = {
+  size: number;
+  fishCount: number;
+};
+type dinnerBear = {
+  size: number;
+  bearCount: number;
+};
+
+// Dinner 要么有 fishCount 要么有 bearCount , 不能同时存在这两个属性
+type Dinner = dinnerFish | dinnerBear;
+
+function eat(dinner: Dinner) {
+  console.log(dinner.size);
+  console.log(dinner.fishCount); // Error
+}
+
+let dinner: Dinner = {}; // Error
+let dinner: Dinner = { size: 1, bearCount: 1 };
+eat({ size: 1 }); // Error
+eat({ size: 1, bearCount: 1 });
+```
+
+### 交叉类型
+
+```ts
+type dinnerFish = {
+  size: number;
+  fishCount: number;
+};
+type dinnerBear = {
+  size: number;
+  bearCount: number;
+};
+
+// Dinner 必须同时存在 size fishCount bearCount 三个属性
+type Dinner = dinnerFish & dinnerBear;
+
+function eat(dinner: Dinner) {
+  console.log(dinner.size); // OK
+  console.log(dinner.fishCount); // OK
+  console.log(dinner.bearCount); // OK
+}
+
+let dinner: Dinner = {}; // Error
+let dinner: Dinner = { size: 1, bearCount: 1 }; // Error
+eat({ size: 1 }); // Error
+eat({ size: 1, bearCount: 1 }); // Error
+```
+
 ### type 和 interface 区别
 
 ```ts
@@ -107,31 +160,6 @@ interface Parent extends typeParent2 {} // OK
 
 - 对于 React 组件 props 和 state 尽量使用 type，防止组件被随意修改
 - 当编写第三方库时，导出类型尽量定义为 interface ，这样使用者可以更方便灵活扩展应对复杂场景
-
-### 联合类型
-
-```ts
-// Dinner 要么有 fish 要么有 bear
-type dinnerFish = {
-  size: number;
-  fishCount: number;
-};
-type dinnerBear = {
-  size: number;
-  bearCount: number;
-};
-type Dinner = dinnerFish | dinnerBear;
-
-function eat(dinner: Dinner) {
-  console.log(dinner.size);
-  console.log(dinner.fishCount); // Error
-}
-
-let dinner: Dinner = {}; // Error
-let dinner: Dinner = { size: 1, bearCount: 1 };
-eat({ size: 1 }); // Error
-eat({ size: 1, bearCount: 1 });
-```
 
 ### 小技巧
 
