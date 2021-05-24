@@ -48,7 +48,7 @@ function controlFlowAnalysisWithNever(foo: Foo) {
 }
 ```
 
-### 特殊类型 - unknow | any
+### 特殊类型 - unknow vs any
 
 - 可以将任意类型赋值给 `any | unknow`
 - 不能直接将 `unknow` 类型变量赋值给除 `any | unknow` 之外类型变量，但是可以将 `any` 类型变量赋值给任意其他类型变量
@@ -211,10 +211,6 @@ const a = { foo: { bar: 22 } };
 const b = a as DeepReadonly<typeof a>;
 b.foo.bar = 33; // Error
 
-const toArray = <T>(element: T) => [element]; // Error
-
-const toArray = <T extends {}>(element: T) => [element]; // Ok
-
 // 自定义类型保护的类型谓词
 function fn1(arg: number | string) {
   if (typeof arg === "number") {
@@ -279,10 +275,6 @@ interface Student {
 // 解决方案二
 let student = { nickname: "tom", age: 100 };
 fn1(student);
-
-// 注意解决方案一
-let student = { nickname: "tom", score: 100 };
-fn1(student); // Error
 ```
 
 ### 特殊操作符 - typeof
