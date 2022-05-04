@@ -1,9 +1,9 @@
 ### 模式匹配
 ```
 type A = [1, 2, 3]
-type TypeA = A extends [infer First, ...infer Rest] ? First : never // 1
+type TypeA = A extends [infer First, ...infer Rest,infer Last] ? First : never // 1
 type B = '123'
-type TypeB = B extends `${infer FirstChar}${infer Rest}` ? FirstChar : never // '1'
+type TypeB = B extends `${infer FirstChar}-${infer Rest}` ? FirstChar : never // '1'
 ```
 
 ### 特殊操作
@@ -40,6 +40,17 @@ type Result2 = Example2<"1" | "2" | 3 | 4> // { 1: "1"; 2: "2"; 3: 3; 4: 4; }
 ```
 type TupleToUnion<T extends unknown[]> = T[number]
 type Result = TupleToUnion<[1, 2, 3]> // 1 | 2 | 3 
+```
+- 定义类数字类型
+```
+type NumberLike = number | `${number}`
+const list: NumberLike[] = [43,'3434','abc'] // error: Type abc is not assignable to type NumberLike
+```
+- 获取函数参数长度
+```
+type GetFunctionLength<F extends Noop> = F extends (...args: infer P) => any
+  ? P["length"]
+  : never
 ```
 
 ### 实用Tip
