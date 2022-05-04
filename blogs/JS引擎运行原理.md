@@ -10,7 +10,7 @@
 
 js引擎会继续执行（2步骤，循环往复
 
-[在线演示](http://latentflip.com/loupe)
+[在线演示](http://latentflip.com/loupe) [在线演示2](https://www.jsv9000.app/?continueFlag=8b5ae376338b9bad279dc587e8b86906) https://github.com/Hopding/js-visualizer-9000-client
 
 
 
