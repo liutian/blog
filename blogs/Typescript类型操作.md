@@ -1,66 +1,101 @@
 
-### 索引访问
-```typescript
-type MessageOf<T> = T extends { message: unknown } ? T["message"] : never;
+### 索引访问类型
+```ts
+// 通过属性字符串生成新类型
+type ObjType = {
+  name: string,
+  age: number
+}
+type Newtype = ObjType['name'];
+
+// 通过数字类型生成新类型并可链式使用
+type ArrayType = ObjType[];
+type NewType = ArrayType[number]['age'];
+
+// 通过范型方式生成新类型
+type GetValueType<T extends {[prop: string]: any},K extends string> = T[K];
+type ObjType = {
+  name: string,
+  age: number
+}
+type NewType = GetValueType<ObjType,'name' | 'age'>;
 ```
 ### map映射类型
-```typescript
-const MyArray = [
-  { name: "Alice", age: 15 },
-  { name: "Bob", age: 23 },
-  { name: "Eve", age: 38 },
-];
- 
-type Person = typeof MyArray[number]; 
+```ts
+// 改变属性的值类型
+type ObjType = {
+  name: string,
+  age: number,
+  birthday: Date
+}
+type ChangePropType<T> = {
+  [Prop in keyof T]: boolean
+}
+type NewType = ChangePropType<ObjType>;
+const obj = {} as NewType;
 
-type Age = typeof MyArray[number]["age"]; 
+// 改变属性名
+type ChangeValueType<T> = {
+  [Prop in keyof T as `new_${Prop & string}`]: T[Prop]
+}
+type NewType = ChangeValueType<ObjType>;
 
-type key = "age";
-type Age3 = Person[key]; 
+// 改变属性特性
+type ObjType = {
+  name: string,
+  readonly age: number,
+  birthday?: Date
+}
+type ChangePropFeatures<T> = {
+  -readonly [Prop in keyof T]-?: T[Prop]
+}
+type NewType = ChangePropFeatures<ObjType>;
+```
+### 函数范型定义方式
+```ts
+// 函数声明时定义范型
+const clone = <T>(origin: T): T => {
+  return {} as any;
+}
+
+// 先定义范型
+type cloneFnType = <T>(origin: T) => T
+const clone: cloneFnType = (origin) => {
+  return {} as any;
+}
+
 ```
 
-### 模式匹配
+### 类和范型特殊用例
+```ts
+const query = <T,K extends keyof T>(table: new () => T,columns: K[]):T => {
+  return {} as any;
+}
+class Demo{
+  name:string;
+}
+query(Demo,['name'])
 ```
-type A = [1, 2, 3]
-type TypeA = A extends [infer First, ...infer Rest,infer Last] ? First : never // 1
-type B = '123'
-type TypeB = B extends `${infer FirstChar}${infer Rest}` ? FirstChar : never // '1'
-```
-### 循环
-```typescript
+### 模版字面量类型
+```ts
+// 联合类型交叉产生新类型
+type StrType1 = 'a' | 'b';
+type StrType2 = '1' | '2';
+type NewType = `${StrType1}_${StrType2}`;
+
+
+// 和数组配合
+type Str = '123'
+type NewStr = Str extends `${infer FirstChar}${infer Rest}` ? FirstChar : never;
+
+
+// 递归遍历
 type IterationString<Str, Item> = Str extends `${infer Char}${infer Rest}` ? IterationString<Rest, Char | Item>  : Item ;
 
-type CharSet = IterationString<'abc|abc', never> // "a" | "b" | "c" | "|"
 
-```
-### 其他方式的循环
-```typescript
-// 分布式条件类型，当泛型参数 T 为联合类型时，条件类型即为分布式条件类型，会将 T 中的每一项分别分发给 extends 进行比对
-type Example1<T> = T extends number ? T : never
-
-type Result1 = Example1<"1" | "2" | 3 | 4> // 3 | 4
-
-// 映射类型，固定写法，in 操作符会分发 T 成为新对象类型的键
-type Example2<T> = {
-  [Key in T]: Key
-}
-type Result2 = Example2<"1" | "2" | 3 | 4> // { 1: "1"; 2: "2"; 3: 3; 4: 4; }
-```
-### 从元组类型构造联合类型
-```typescript
-type TupleToUnion<T extends unknown[]> = T[number]
-type Result = TupleToUnion<[1, 2, 3]> // 1 | 2 | 3 
-```
-### 定义类数字类型
-```typescript
+// 定义类数字数组
 type NumberLike = number | `${number}`
 const list: NumberLike[] = [43,'3434','abc'] // error: Type abc is not assignable to type NumberLike
-```
-- 获取函数参数长度
-```typescript
-type GetFunctionLength<F> = F extends (...args: infer P) => any
-  ? P["length"]
-  : never
 ```
 
 ### 实用Tip
@@ -85,13 +120,6 @@ type Params = GetFunResult<(params1: string,params2: number) => boolean> // bool
 type GetFunResult<F> = F extends (...params: infer Params) => infer Result ? GetPromiseValue<Result>: never;
 
 type Params = GetFunResult<(params1: string,params2: number) => Promise<boolean>> // boolean
-```
-
-- 改变属性名称
-```typescript
-type ChangePropKey<T> = {
-  [Prop in keyof T as `new_${Prop & string}`]: T[Prop]
-}
 ```
 
 - 对类型新增方法定义，并约束方法签名
@@ -139,7 +167,6 @@ type StringKeyOf<T, E extends string = never> =
 type GetKeyType<T, K> = K extends keyof T ? ConvertArray<T[K]> : never;
 
 type ConvertArray<T> = T extends Array<infer U> ? ConvertArray<U> : T;
-
 
 ```
 ### 收藏地址
